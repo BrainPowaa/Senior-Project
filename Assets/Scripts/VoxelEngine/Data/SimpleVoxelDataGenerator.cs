@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,10 +29,10 @@ namespace VoxelEngine.Data
             intensity += offset;
 
             return new VoxelData
-            {
-                intensity = intensity,
-                material = VoxelMaterial.Dirt
-            };
+            (
+                (byte)(intensity * 16),
+                0
+            );
         }
     }
 }

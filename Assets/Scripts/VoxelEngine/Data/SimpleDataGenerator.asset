@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96d8d28ef77240be93c1d894a7cd80fd, type: 3}
   m_Name: SimpleDataGenerator
   m_EditorClassIdentifier: 
-  seed: 3
+  seed: 4
   scale: 0.1
   offset: 0

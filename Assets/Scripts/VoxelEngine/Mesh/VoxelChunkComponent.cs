@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using VoxelEngine.Data;
-using VoxelEngine.Rendering;
+using VoxelEngine.Mesh;
 using VoxelEngine.Types;
 
-namespace VoxelEngine.Rendering
+namespace VoxelEngine.Mesh
 {
     [ExecuteAlways]
     public class VoxelChunkComponent : MonoBehaviour
@@ -17,7 +17,7 @@ namespace VoxelEngine.Rendering
         private byte ChunkSize = 16;
 
         private MeshRenderer _meshRenderer;
-        private Mesh _mesh;
+        private UnityEngine.Mesh _mesh;
         private MeshFilter _meshFilter;
     
         // Start is called before the first frame update
@@ -25,7 +25,7 @@ namespace VoxelEngine.Rendering
         {
             _meshRenderer = gameObject.GetComponent<MeshRenderer>();
             _meshFilter = gameObject.GetComponent<MeshFilter>();
-            _mesh = gameObject.GetComponent<Mesh>();
+            _mesh = gameObject.GetComponent<UnityEngine.Mesh>();
             
             if (!_meshRenderer)
             {
@@ -39,7 +39,7 @@ namespace VoxelEngine.Rendering
 
             if (!_mesh)
             {
-                _mesh = new Mesh();
+                _mesh = new UnityEngine.Mesh();
             }
 
             _meshFilter.mesh = _mesh;
@@ -47,13 +47,20 @@ namespace VoxelEngine.Rendering
             GenerateMesh();
         }
         
-        void GenerateMesh()
+        void OnValidate()
+        {
+            GenerateMesh();
+        }
+        
+        public void GenerateMesh()
         {
             dataGenerator.InitializeGenerator();
 
             var chunk = dataGenerator.CreateChunkData(position);
 
             VoxelMeshRenderData meshData = meshGenerator.GenerateChunkMesh(chunk, position);
+            
+            _mesh.Clear();
             
             _mesh.SetVertices(meshData.vertices);
             _mesh.SetTriangles(meshData.triangles, 0);

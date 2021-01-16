@@ -5,14 +5,19 @@ using UnityEngine;
 using VoxelEngine.Data;
 using VoxelEngine.Types;
 
-namespace VoxelEngine.Rendering
+namespace VoxelEngine.Mesh
 {
     [CreateAssetMenu(fileName = "CubicGenerator.asset", menuName = "VoxelEngine/Mesh/Cubic Generator")]
     public class CubicVoxelChunkMeshGenerator : VoxelChunkMeshGeneratorBase
     {
         public override VoxelMeshRenderData GenerateVoxel(Vector3Int position, VoxelData voxel, VoxelData[] neighbors)
         {
-            if (voxel.intensity < 0.5)
+            (byte, byte) data = voxel.UnpackData();
+
+            var intensity = data.Item1;
+            var materialIndex = data.Item2;
+            
+            if (intensity < 8)
             {
                 return new VoxelMeshRenderData(new List<Vector3>(), new List<int>());
             }

@@ -8,7 +8,7 @@ using VoxelEngine.Data;
 using VoxelEngine.Types;
 using Vector3 = UnityEngine.Vector3;
 
-namespace VoxelEngine.Rendering
+namespace VoxelEngine.Mesh
 {
     public struct VoxelMeshRenderData
     {

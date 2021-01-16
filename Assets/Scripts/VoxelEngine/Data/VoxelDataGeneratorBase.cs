@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using VoxelEngine.Mesh;
 using VoxelEngine.Types;
+using Random = UnityEngine.Random;
 
 namespace VoxelEngine.Data
 {
@@ -13,6 +16,14 @@ namespace VoxelEngine.Data
         public void InitializeGenerator()
         {
             Random.InitState(seed);
+        }
+
+        void OnValidate()
+        {
+            foreach (var chunkComponent in FindObjectsOfType<VoxelChunkComponent>())
+            {
+                chunkComponent.GenerateMesh();
+            }
         }
 
         public virtual ChunkData CreateChunkData(Vector3Int chunkPosition)
