@@ -7,61 +7,61 @@
 *.prefab -text -merge=unityamlmerge
 
 # Image formats
-*.psd filter=lfs diff=lfs merge=lfs -text
-*.jpg filter=lfs diff=lfs merge=lfs -text
-*.png filter=lfs diff=lfs merge=lfs -text
-*.gif filter=lfs diff=lfs merge=lfs -text
-*.bmp filter=lfs diff=lfs merge=lfs -text
-*.tga filter=lfs diff=lfs merge=lfs -text
-*.tiff filter=lfs diff=lfs merge=lfs -text
-*.iff filter=lfs diff=lfs merge=lfs -text
-*.pict filter=lfs diff=lfs merge=lfs -text
-*.dds filter=lfs diff=lfs merge=lfs -text
-*.xcf filter=lfs diff=lfs merge=lfs -text
+*.psd filter=lfs diff=lfs merge=lfs -text lockable
+*.jpg filter=lfs diff=lfs merge=lfs -text lockable
+*.png filter=lfs diff=lfs merge=lfs -text lockable
+*.gif filter=lfs diff=lfs merge=lfs -text lockable
+*.bmp filter=lfs diff=lfs merge=lfs -text lockable
+*.tga filter=lfs diff=lfs merge=lfs -text lockable
+*.tiff filter=lfs diff=lfs merge=lfs -text lockable
+*.iff filter=lfs diff=lfs merge=lfs -text lockable
+*.pict filter=lfs diff=lfs merge=lfs -text lockable
+*.dds filter=lfs diff=lfs merge=lfs -text lockable
+*.xcf filter=lfs diff=lfs merge=lfs -text lockable
 
 # Audio formats
-*.mp3 filter=lfs diff=lfs merge=lfs -text
-*.ogg filter=lfs diff=lfs merge=lfs -text
-*.wav filter=lfs diff=lfs merge=lfs -text
-*.aiff filter=lfs diff=lfs merge=lfs -text
-*.aif filter=lfs diff=lfs merge=lfs -text
-*.mod filter=lfs diff=lfs merge=lfs -text
-*.it filter=lfs diff=lfs merge=lfs -text
-*.s3m filter=lfs diff=lfs merge=lfs -text
-*.xm filter=lfs diff=lfs merge=lfs -text
+*.mp3 filter=lfs diff=lfs merge=lfs -text lockable
+*.ogg filter=lfs diff=lfs merge=lfs -text lockable
+*.wav filter=lfs diff=lfs merge=lfs -text lockable
+*.aiff filter=lfs diff=lfs merge=lfs -text lockable
+*.aif filter=lfs diff=lfs merge=lfs -text lockable
+*.mod filter=lfs diff=lfs merge=lfs -text lockable
+*.it filter=lfs diff=lfs merge=lfs -text lockable
+*.s3m filter=lfs diff=lfs merge=lfs -text lockable
+*.xm filter=lfs diff=lfs merge=lfs -text lockable
 
 # Video formats
-*.mov filter=lfs diff=lfs merge=lfs -text
-*.avi filter=lfs diff=lfs merge=lfs -text
-*.asf filter=lfs diff=lfs merge=lfs -text
-*.mpg filter=lfs diff=lfs merge=lfs -text
-*.mpeg filter=lfs diff=lfs merge=lfs -text
-*.mp4 filter=lfs diff=lfs merge=lfs -text
+*.mov filter=lfs diff=lfs merge=lfs -text lockable
+*.avi filter=lfs diff=lfs merge=lfs -text lockable
+*.asf filter=lfs diff=lfs merge=lfs -text lockable
+*.mpg filter=lfs diff=lfs merge=lfs -text lockable
+*.mpeg filter=lfs diff=lfs merge=lfs -text lockable
+*.mp4 filter=lfs diff=lfs merge=lfs -text lockable
 
 # 3D formats
-*.fbx filter=lfs diff=lfs merge=lfs -text
-*.obj filter=lfs diff=lfs merge=lfs -text
-*.max filter=lfs diff=lfs merge=lfs -text
-*.blend filter=lfs diff=lfs merge=lfs -text
-*.dae filter=lfs diff=lfs merge=lfs -text
-*.mb filter=lfs diff=lfs merge=lfs -text
-*.ma filter=lfs diff=lfs merge=lfs -text
-*.3ds filter=lfs diff=lfs merge=lfs -text
-*.dfx filter=lfs diff=lfs merge=lfs -text
-*.c4d filter=lfs diff=lfs merge=lfs -text
-*.lwo filter=lfs diff=lfs merge=lfs -text
-*.lwo2 filter=lfs diff=lfs merge=lfs -text
-*.abc filter=lfs diff=lfs merge=lfs -text
-*.3dm filter=lfs diff=lfs merge=lfs -text
+*.fbx filter=lfs diff=lfs merge=lfs -text lockable
+*.obj filter=lfs diff=lfs merge=lfs -text lockable
+*.max filter=lfs diff=lfs merge=lfs -text lockable
+*.blend filter=lfs diff=lfs merge=lfs -text lockable
+*.dae filter=lfs diff=lfs merge=lfs -text lockable
+*.mb filter=lfs diff=lfs merge=lfs -text lockable
+*.ma filter=lfs diff=lfs merge=lfs -text lockable
+*.3ds filter=lfs diff=lfs merge=lfs -text lockable
+*.dfx filter=lfs diff=lfs merge=lfs -text lockable
+*.c4d filter=lfs diff=lfs merge=lfs -text lockable
+*.lwo filter=lfs diff=lfs merge=lfs -text lockable
+*.lwo2 filter=lfs diff=lfs merge=lfs -text lockable
+*.abc filter=lfs diff=lfs merge=lfs -text lockable
+*.3dm filter=lfs diff=lfs merge=lfs -text lockable
 
 # Build
-*.dll filter=lfs diff=lfs merge=lfs -text
-*.pdb filter=lfs diff=lfs merge=lfs -text
-*.mdb filter=lfs diff=lfs merge=lfs -text
+*.dll filter=lfs diff=lfs merge=lfs -text lockable
+*.pdb filter=lfs diff=lfs merge=lfs -text lockable
+*.mdb filter=lfs diff=lfs merge=lfs -text lockable
 
 # Packaging
-*.zip filter=lfs diff=lfs merge=lfs -text
-*.7z filter=lfs diff=lfs merge=lfs -text
-*.gz filter=lfs diff=lfs merge=lfs -text
-*.rar filter=lfs diff=lfs merge=lfs -text
-*.tar filter=lfs diff=lfs merge=lfs -text
+*.zip filter=lfs diff=lfs merge=lfs -text lockable
+*.7z filter=lfs diff=lfs merge=lfs -text lockable
+*.gz filter=lfs diff=lfs merge=lfs -text lockable
+*.rar filter=lfs diff=lfs merge=lfs -text lockable
+*.tar filter=lfs diff=lfs merge=lfs -text lockable
