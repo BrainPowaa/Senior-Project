@@ -2,6 +2,6 @@ namespace VoxelEngine.Types
 {
     public static class VoxelEngineConstant
     {
-        public static readonly int ChunkSize = 16;
+        public static readonly int ChunkSize = 32;
     }
 }

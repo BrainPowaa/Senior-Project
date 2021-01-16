@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using VoxelEngine.Data;
 using VoxelEngine.Mesh;
 using VoxelEngine.Types;
@@ -13,6 +15,7 @@ namespace VoxelEngine.Mesh
         public VoxelChunkMeshGeneratorBase meshGenerator;
         public VoxelDataGeneratorBase dataGenerator;
         public Vector3Int position;
+        public Material material;
 
         private byte ChunkSize = 16;
 
@@ -21,7 +24,20 @@ namespace VoxelEngine.Mesh
         private MeshFilter _meshFilter;
     
         // Start is called before the first frame update
-        void Start()
+        private void Start()
+        {
+            if (meshGenerator != null && dataGenerator != null && material != null)
+            {
+                Init();
+            }
+        }
+
+        void OnValidate()
+        {
+            GenerateMesh();
+        }
+        
+        public void Init()
         {
             _meshRenderer = gameObject.GetComponent<MeshRenderer>();
             _meshFilter = gameObject.GetComponent<MeshFilter>();
@@ -42,13 +58,12 @@ namespace VoxelEngine.Mesh
                 _mesh = new UnityEngine.Mesh();
             }
 
-            _meshFilter.mesh = _mesh;
+            _meshRenderer.material = material;
             
-            GenerateMesh();
-        }
-        
-        void OnValidate()
-        {
+            _meshFilter.mesh = _mesh;
+
+            _mesh.indexFormat = IndexFormat.UInt32;
+            
             GenerateMesh();
         }
         
