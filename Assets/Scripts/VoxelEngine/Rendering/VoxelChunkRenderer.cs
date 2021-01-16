@@ -20,9 +20,7 @@ namespace VoxelEngine.Rendering
         // Update is called once per frame
         void Update()
         {
-            // Stupid
-            Debug.Log("Sup");
+            
         }
     }
 }
-//resdfkalsjdf;lasjdf This is a test of thttsdjklfhalskdfh yeyeyeytetttetetasdsddlkfhsjdfasdf
