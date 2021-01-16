@@ -3,16 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using VoxelEngine.Data;
+using VoxelEngine.Types;
 
 namespace VoxelEngine.Rendering
 {
-    [CreateAssetMenu]
-    class CubicVoxelChunkMeshGenerator : VoxelChunkMeshGeneratorBase
+    [CreateAssetMenu(fileName = "CubicGenerator.asset", menuName = "VoxelEngine/Mesh/Cubic Generator")]
+    public class CubicVoxelChunkMeshGenerator : VoxelChunkMeshGeneratorBase
     {
-        public override VoxelChunkMeshRenderData GenerateVoxel(ref VoxelData voxel, VoxelData[] neighbors)
+        public override VoxelMeshRenderData GenerateVoxel(Vector3Int position, VoxelData voxel, VoxelData[] neighbors)
         {
+            if (voxel.intensity < 0.5)
+            {
+                return new VoxelMeshRenderData(new List<Vector3>(), new List<int>());
+            }
+
+            var x = position.x;
+            var y = position.y;
+            var z = position.z;
+            
             // Refer to CubeReference.png
-            List<Vector3> vertices = new List<Vector3>()
+            var vertices = new List<Vector3>()
             {
                 new Vector3(0, 0, 0),
                 new Vector3(1, 0, 0), // X
@@ -25,7 +35,7 @@ namespace VoxelEngine.Rendering
             };
 
             // Triangles
-            List<int> tris = new List<int>()
+            var tris = new List<int>()
             {
                 // -X face
                 4, 6, 0,
@@ -40,8 +50,8 @@ namespace VoxelEngine.Rendering
                 3, 1, 2,
 
                 // +Z face
-                5, 4, 7,
-                6, 7, 4,
+                5, 7, 4,
+                6, 4, 7,
 
                 // -Y face
                 0, 1, 4,
@@ -52,11 +62,7 @@ namespace VoxelEngine.Rendering
                 6, 7, 2,
             };
 
-            return new VoxelChunkMeshRenderData
-            {
-                Verticies = vertices,
-                Triangles = tris
-            };
+            return new VoxelMeshRenderData(vertices, tris);
         }
     }
 
