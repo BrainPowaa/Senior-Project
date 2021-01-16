@@ -10,5 +10,17 @@ namespace VoxelEngine.Rendering
     class VoxelChunkRenderer : MonoBehaviour
     {
         public VoxelChunkMeshGeneratorBase generator;
+    
+        // Start is called before the first frame update
+        void Start()
+        {
+            //Sauce
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            // Awesome
+        }
     }
 }
