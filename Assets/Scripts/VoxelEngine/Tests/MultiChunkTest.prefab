@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8542734490280178712}
   - component: {fileID: -3921121679753060879}
   m_Layer: 0
-  m_Name: AnotherChunkTest
+  m_Name: MultiChunkTest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,6 +44,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshGenerator: {fileID: 11400000, guid: 6283378bedbf9ac42933c12ba3218825, type: 2}
-  dataGenerator: {fileID: 11400000, guid: 940a2a2a2eb600842a3e026c40ed3d17, type: 2}
-  numberOfChunks: {x: 2, y: 2, z: 2}
+  dataGenerator: {fileID: 11400000, guid: cdaa617aa0492c249b2860acdb073f59, type: 2}
+  numberOfChunks: {x: 3, y: 2, z: 3}
   material: {fileID: 2100000, guid: cbda37ddf17887d49903237feedb36b2, type: 2}
