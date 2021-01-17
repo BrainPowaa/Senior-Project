@@ -28,31 +28,33 @@ namespace VoxelEngine.Mesh
         {
             VoxelMeshRenderData meshData = new VoxelMeshRenderData(new List<Vector3>(), new List<int>());
 
-            for (int i = 0; i < VoxelEngineConstant.MaxChunkSize; i++)
+            for (int y = 0; y < VoxelEngineConstant.ChunkSize; y++)
             {
-                var x = i % VoxelEngineConstant.ChunkSize;
-                var z = (i / VoxelEngineConstant.ChunkSize) % VoxelEngineConstant.ChunkSize;
-                var y = i / VoxelEngineConstant.ChunkSize / VoxelEngineConstant.ChunkSize;
-
-                var position = new Vector3Int(x, y, z);
-
-                var dataPoint = position;
-                dataPoint.x += (chunkPosition.x * VoxelEngineConstant.ChunkSize);
-                dataPoint.y += (chunkPosition.y * VoxelEngineConstant.ChunkSize);
-                dataPoint.z += (chunkPosition.z * VoxelEngineConstant.ChunkSize);
-
-                var neighbors = new VoxelData[6];
-
-                var generatedVoxel = GenerateVoxel(dataPoint, ref chunkData.voxels[i], neighbors);
-
-                foreach(var triangle in generatedVoxel.triangles)
+                for (int z = 0; z < VoxelEngineConstant.ChunkSize; z++)
                 {
-                    meshData.triangles.Add(triangle + meshData.vertices.Count);
-                }
-                
-                foreach(var vertex in generatedVoxel.vertices)
-                {
-                    meshData.vertices.Add(vertex + position);
+                    for (int x = 0; x < VoxelEngineConstant.ChunkSize; x++)
+                    {
+                        var position = new Vector3Int(x, y, z);
+
+                        var dataPoint = position;
+                        dataPoint.x += (chunkPosition.x * VoxelEngineConstant.ChunkSize);
+                        dataPoint.y += (chunkPosition.y * VoxelEngineConstant.ChunkSize);
+                        dataPoint.z += (chunkPosition.z * VoxelEngineConstant.ChunkSize);
+
+                        var neighbors = new VoxelData[6];
+
+                        var generatedVoxel = GenerateVoxel(dataPoint, ref chunkData.voxels[x,y,z], neighbors);
+
+                        foreach (var triangle in generatedVoxel.triangles)
+                        {
+                            meshData.triangles.Add(triangle + meshData.vertices.Count);
+                        }
+
+                        foreach (var vertex in generatedVoxel.vertices)
+                        {
+                            meshData.vertices.Add(vertex + position);
+                        }
+                    }
                 }
             }
 

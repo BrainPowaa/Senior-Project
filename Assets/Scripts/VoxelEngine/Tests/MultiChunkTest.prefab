@@ -45,5 +45,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   meshGenerator: {fileID: 11400000, guid: 6283378bedbf9ac42933c12ba3218825, type: 2}
   dataGenerator: {fileID: 11400000, guid: cdaa617aa0492c249b2860acdb073f59, type: 2}
-  numberOfChunks: {x: 3, y: 2, z: 3}
+  numberOfChunks: {x: 1, y: 1, z: 1}
   material: {fileID: 2100000, guid: cbda37ddf17887d49903237feedb36b2, type: 2}
