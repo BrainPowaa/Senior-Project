@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: JamesDataGenerator
   m_EditorClassIdentifier: 
   seed: 0
-  scale: 3.5
-  offset: 0.75
+  scale: 0.61
+  offset: 0.77
