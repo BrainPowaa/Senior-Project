@@ -22,7 +22,7 @@ namespace VoxelEngine.Types
         }
 
         // Packs intensity and material index (nibbles) into a byte for storage
-        public byte PackData(byte intensity, byte materialIndex)
+        public static byte PackData(byte intensity, byte materialIndex)
         {
             intensity = (byte) (intensity << 4);
             materialIndex = (byte) (materialIndex & 0x0F);
@@ -31,10 +31,10 @@ namespace VoxelEngine.Types
         }
         
         // Packs intensity and material index (nibbles) into a byte for storage
-        public (byte, byte) UnpackData()
+        public static (byte, byte) UnpackData(byte info)
         {
-            byte intensity = (byte) (info >> 4);
-            byte materialIndex = (byte) (info & 0x0F);
+            var intensity = (byte) (info >> 4);
+            var materialIndex = (byte) (info & 0x0F);
 
             return (intensity, materialIndex);
         }

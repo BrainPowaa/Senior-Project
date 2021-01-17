@@ -24,11 +24,11 @@ namespace VoxelEngine.Mesh
 
     public abstract class VoxelChunkMeshGeneratorBase : ScriptableObject
     {
-        public virtual VoxelMeshRenderData GenerateChunkMesh(ChunkData chunkData, Vector3Int chunkPosition)
+        public virtual VoxelMeshRenderData GenerateChunkMesh(ref ChunkData chunkData, Vector3Int chunkPosition)
         {
             VoxelMeshRenderData meshData = new VoxelMeshRenderData(new List<Vector3>(), new List<int>());
-            
-            for (int i = 0; i < chunkData.Voxels.Count; i++)
+
+            for (int i = 0; i < VoxelEngineConstant.MaxChunkSize; i++)
             {
                 var x = i % VoxelEngineConstant.ChunkSize;
                 var z = (i / VoxelEngineConstant.ChunkSize) % VoxelEngineConstant.ChunkSize;
@@ -43,7 +43,7 @@ namespace VoxelEngine.Mesh
 
                 var neighbors = new VoxelData[6];
 
-                var generatedVoxel = GenerateVoxel(dataPoint, chunkData.Voxels[i], neighbors);
+                var generatedVoxel = GenerateVoxel(dataPoint, ref chunkData.voxels[i], neighbors);
 
                 foreach(var triangle in generatedVoxel.triangles)
                 {
@@ -59,6 +59,6 @@ namespace VoxelEngine.Mesh
             return meshData;
         }
 
-        public abstract VoxelMeshRenderData GenerateVoxel(Vector3Int position, VoxelData voxel, VoxelData[] neighbors);
+        public abstract VoxelMeshRenderData GenerateVoxel(Vector3Int position, ref VoxelData voxel, VoxelData[] neighbors);
     }
 }

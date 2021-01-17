@@ -22,20 +22,15 @@ namespace VoxelEngine.Data
         {
             foreach (var chunkComponent in FindObjectsOfType<VoxelChunkComponent>())
             {
-                chunkComponent.GenerateMesh();
+                chunkComponent.RefreshChunk();
             }
         }
 
         public virtual ChunkData CreateChunkData(Vector3Int chunkPosition)
         {
-            int maxChunkSize =
-                VoxelEngineConstant.ChunkSize *
-                VoxelEngineConstant.ChunkSize *
-                VoxelEngineConstant.ChunkSize;
-
-            List<VoxelData> voxels = new List<VoxelData>();
+            var voxels = new VoxelData[VoxelEngineConstant.MaxChunkSize];
             
-            for (int i = 0; i < maxChunkSize; i++)
+            for (int i = 0; i < VoxelEngineConstant.MaxChunkSize; i++)
             {
                 var x = i % VoxelEngineConstant.ChunkSize;
                 var z = (i / VoxelEngineConstant.ChunkSize) % VoxelEngineConstant.ChunkSize;
@@ -48,11 +43,35 @@ namespace VoxelEngine.Data
                     z + (chunkPosition.z * VoxelEngineConstant.ChunkSize)
                 );
 
-                voxels.Add(CreateVoxelData(position));
+                var intensity = (byte)(CreateVoxelData(position) * 15);
+                
+                voxels[i].info = VoxelData.PackData(intensity, 0);
             }
 
             return new ChunkData(voxels);
         }
-        public abstract VoxelData CreateVoxelData(Vector3Int position);
+        
+        public virtual void RefreshChunkData(ref ChunkData chunkData, Vector3Int chunkPosition)
+        {
+            for (int i = 0; i < VoxelEngineConstant.MaxChunkSize; i++)
+            {
+                var x = i % VoxelEngineConstant.ChunkSize;
+                var z = (i / VoxelEngineConstant.ChunkSize) % VoxelEngineConstant.ChunkSize;
+                var y = i / VoxelEngineConstant.ChunkSize / VoxelEngineConstant.ChunkSize;
+                
+                var position = new Vector3Int
+                (
+                    x + (chunkPosition.x * VoxelEngineConstant.ChunkSize),
+                    y + (chunkPosition.y * VoxelEngineConstant.ChunkSize),
+                    z + (chunkPosition.z * VoxelEngineConstant.ChunkSize)
+                );
+
+                var intensity = (byte)(CreateVoxelData(position) * 15);
+                
+                chunkData.voxels[i].info = VoxelData.PackData(intensity, 0);
+            }
+        }
+        
+        public abstract float CreateVoxelData(Vector3Int position);
     }
 }

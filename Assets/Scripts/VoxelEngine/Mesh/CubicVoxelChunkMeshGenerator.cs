@@ -10,9 +10,9 @@ namespace VoxelEngine.Mesh
     [CreateAssetMenu(fileName = "CubicGenerator.asset", menuName = "VoxelEngine/Mesh/Cubic Generator")]
     public class CubicVoxelChunkMeshGenerator : VoxelChunkMeshGeneratorBase
     {
-        public override VoxelMeshRenderData GenerateVoxel(Vector3Int position, VoxelData voxel, VoxelData[] neighbors)
+        public override VoxelMeshRenderData GenerateVoxel(Vector3Int position, ref VoxelData voxel, VoxelData[] neighbors)
         {
-            (byte, byte) data = voxel.UnpackData();
+            (byte, byte) data = VoxelData.UnpackData(voxel.info);
 
             var intensity = data.Item1;
             var materialIndex = data.Item2;

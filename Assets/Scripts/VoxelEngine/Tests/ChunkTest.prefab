@@ -46,8 +46,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   meshGenerator: {fileID: 11400000, guid: 6283378bedbf9ac42933c12ba3218825, type: 2}
-  dataGenerator: {fileID: 11400000, guid: 940a2a2a2eb600842a3e026c40ed3d17, type: 2}
+  dataGenerator: {fileID: 11400000, guid: 04ee099a80de9b74392f615d46d1b550, type: 2}
   position: {x: 1, y: 0, z: 0}
+  material: {fileID: 2100000, guid: cbda37ddf17887d49903237feedb36b2, type: 2}
 --- !u!23 &8629950601522619086
 MeshRenderer:
   m_ObjectHideFlags: 0

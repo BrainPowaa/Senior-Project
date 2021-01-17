@@ -6,11 +6,11 @@ namespace VoxelEngine.Types
 {
     public struct ChunkData
     {
-        public readonly List<VoxelData> Voxels;
+        public readonly VoxelData[] voxels;
 
-        public ChunkData(List<VoxelData> voxels)
+        public ChunkData(VoxelData[] voxels)
         {
-            Voxels = voxels;
+            this.voxels = voxels;
         }
     }
 }

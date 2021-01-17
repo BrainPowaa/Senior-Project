@@ -87,7 +87,7 @@ namespace VoxelEngine.Mesh
                             if (chunk.position == position)
                             {
                                 chunkFound = true;
-                                chunk.GenerateMesh();
+                                chunk.RefreshChunk();
 
                                 break;
                             }

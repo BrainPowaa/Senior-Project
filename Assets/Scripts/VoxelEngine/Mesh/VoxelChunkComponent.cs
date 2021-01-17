@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Profiling;
 using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 using VoxelEngine.Data;
 using VoxelEngine.Mesh;
@@ -12,20 +15,26 @@ namespace VoxelEngine.Mesh
     [ExecuteAlways]
     public class VoxelChunkComponent : MonoBehaviour
     {
+        static ProfilerMarker s_InitPerfMarker = new ProfilerMarker("VoxelEngine.Init");
+        static ProfilerMarker s_DataPointPerfMarker = new ProfilerMarker("VoxelEngine.DataPointGen");
+        static ProfilerMarker s_MeshGenerationPerfMarker = new ProfilerMarker("VoxelEngine.MeshGeneration");
+        
         public VoxelChunkMeshGeneratorBase meshGenerator;
         public VoxelDataGeneratorBase dataGenerator;
         public Vector3Int position;
         public Material material;
 
-        private byte ChunkSize = 16;
-
         private MeshRenderer _meshRenderer;
         private UnityEngine.Mesh _mesh;
         private MeshFilter _meshFilter;
+
+        private ChunkData _chunkData;
+        private bool _isReady;
     
         // Start is called before the first frame update
         private void Start()
         {
+            _isReady = false;
             if (meshGenerator != null && dataGenerator != null && material != null)
             {
                 Init();
@@ -34,7 +43,7 @@ namespace VoxelEngine.Mesh
 
         void OnValidate()
         {
-            GenerateMesh();
+            RefreshChunk();
         }
         
         public void Init()
@@ -59,21 +68,40 @@ namespace VoxelEngine.Mesh
             }
 
             _meshRenderer.material = material;
-            
             _meshFilter.mesh = _mesh;
-
             _mesh.indexFormat = IndexFormat.UInt32;
             
+            Profiler.BeginSample("My Sample");
+            
+            dataGenerator.InitializeGenerator();
+            _chunkData = dataGenerator.CreateChunkData(position);
+            
+            Profiler.EndSample();
+
+            _isReady = true;
+            
             GenerateMesh();
+        }
+
+        public void RefreshChunk()
+        {
+            if (_isReady)
+            {
+                Assert.IsNotNull(_chunkData.voxels);
+
+                s_DataPointPerfMarker.Begin();
+                
+                dataGenerator.RefreshChunkData(ref _chunkData, position);
+                
+                s_DataPointPerfMarker.End();
+                GenerateMesh();
+            }
         }
         
         public void GenerateMesh()
         {
-            dataGenerator.InitializeGenerator();
-
-            var chunk = dataGenerator.CreateChunkData(position);
-
-            VoxelMeshRenderData meshData = meshGenerator.GenerateChunkMesh(chunk, position);
+            s_MeshGenerationPerfMarker.Begin();
+            VoxelMeshRenderData meshData = meshGenerator.GenerateChunkMesh(ref _chunkData, position);
             
             _mesh.Clear();
             
@@ -82,6 +110,7 @@ namespace VoxelEngine.Mesh
             
             _mesh.RecalculateNormals();
             _mesh.RecalculateBounds();
+            s_MeshGenerationPerfMarker.End();
         }
     }
 }

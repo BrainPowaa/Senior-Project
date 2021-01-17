@@ -10,7 +10,7 @@ namespace VoxelEngine.Data
     public class SimpleVoxelDataGenerator : VoxelDataGeneratorBase
     {
         public float offset = 1;
-        public override VoxelData CreateVoxelData(Vector3Int position)
+        public override float CreateVoxelData(Vector3Int position)
         {
             var x = position.x * scale;
             var y = position.y * scale;
@@ -28,11 +28,7 @@ namespace VoxelEngine.Data
 
             intensity += offset;
 
-            return new VoxelData
-            (
-                (byte)(intensity * 16),
-                0
-            );
+            return intensity;
         }
     }
 }
