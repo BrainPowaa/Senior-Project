@@ -67,6 +67,21 @@ namespace VoxelEngine.Mesh
                 6, 7, 2,
             };
 
+            var index = 0x0;
+            for (int i = 0; i < 6; i++)
+            {
+                if(VoxelData.UnpackData(neighbors[i].info).Item1 >= 8)
+                {
+                    index |= (byte)((1 << i);
+                }
+            }
+
+            if (index == 63)
+            {
+                
+                return new VoxelMeshRenderData(new List<Vector3>(), new List<int>());
+                
+            }
             return new VoxelMeshRenderData(vertices, tris);
         }
     }
