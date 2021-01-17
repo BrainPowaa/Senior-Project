@@ -28,7 +28,7 @@ namespace VoxelEngine.Data
 
         public virtual ChunkData CreateChunkData(Vector3Int chunkPosition)
         {
-            var voxels = new VoxelData[VoxelEngineConstant.ChunkSize,VoxelEngineConstant.ChunkSize,VoxelEngineConstant.ChunkSize];
+            var voxels = ChunkData.CreateVoxelArray();
 
             for (int y = 0; y < VoxelEngineConstant.ChunkSize; y++)
             {
@@ -45,7 +45,7 @@ namespace VoxelEngine.Data
 
                         var intensity = (byte) (CreateVoxelData(position) * 15);
 
-                        voxels[x,y,z].info = VoxelData.PackData(intensity, 0);
+                        voxels[x][y][z].info = VoxelData.PackData(intensity, 0);
                     }
                 }
             }
@@ -70,7 +70,7 @@ namespace VoxelEngine.Data
 
                         var intensity = (byte) (CreateVoxelData(position) * 15);
 
-                        chunkData.voxels[x, y, z].info = VoxelData.PackData(intensity, 0);
+                        chunkData.voxels[x][y][z].info = VoxelData.PackData(intensity, 0);
                     }
                 }
             }

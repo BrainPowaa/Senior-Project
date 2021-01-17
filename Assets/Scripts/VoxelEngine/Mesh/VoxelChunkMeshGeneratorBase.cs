@@ -43,7 +43,7 @@ namespace VoxelEngine.Mesh
 
                         var neighbors = new VoxelData[6];
 
-                        var generatedVoxel = GenerateVoxel(dataPoint, ref chunkData.voxels[x,y,z], neighbors);
+                        var generatedVoxel = GenerateVoxel(dataPoint, ref chunkData.voxels[x][y][z], neighbors);
 
                         foreach (var triangle in generatedVoxel.triangles)
                         {
