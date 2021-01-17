@@ -43,12 +43,23 @@ namespace VoxelEngine.Mesh
 
                         var neighbors = new VoxelData[6];
                         
-                        neighbors[0] = chunkData.voxels[x+1][y][z];
-                        neighbors[1] = chunkData.voxels[x-1][y][z];
-                        neighbors[2] = chunkData.voxels[x][y+1][z];
-                        neighbors[3] = chunkData.voxels[x][y-1][z];
-                        neighbors[4] = chunkData.voxels[x][y][z+1];
-                        neighbors[5] = chunkData.voxels[x][y][z-1];
+                        if(x < VoxelEngineConstant.ChunkSize-1)
+                            neighbors[0] = chunkData.voxels[x+1][y][z];
+                        
+                        if(x > 0)
+                            neighbors[1] = chunkData.voxels[x-1][y][z];
+                        
+                        if(y < VoxelEngineConstant.ChunkSize-1)
+                            neighbors[2] = chunkData.voxels[x][y+1][z];
+                        
+                        if(y > 0)
+                            neighbors[3] = chunkData.voxels[x][y-1][z];
+                        
+                        if(z < VoxelEngineConstant.ChunkSize-1)
+                            neighbors[4] = chunkData.voxels[x][y][z+1];
+                        
+                        if(z > 0)
+                            neighbors[5] = chunkData.voxels[x][y][z-1];
 
                         var generatedVoxel = GenerateVoxel(dataPoint, ref chunkData.voxels[x][y][z], neighbors);
 

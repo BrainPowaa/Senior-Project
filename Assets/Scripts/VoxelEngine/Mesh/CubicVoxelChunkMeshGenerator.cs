@@ -72,7 +72,7 @@ namespace VoxelEngine.Mesh
             {
                 if(VoxelData.UnpackData(neighbors[i].info).Item1 >= 8)
                 {
-                    index |= (byte)((1 << i);
+                    index |= (byte)(1 << i);
                 }
             }
 
