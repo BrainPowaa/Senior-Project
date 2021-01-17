@@ -12,10 +12,9 @@ namespace VoxelEngine.Data
     {
         public float offset = 1;
         private FastNoise Noise = new FastNoise();
-        public override VoxelData CreateVoxelData(Vector3Int position)
+        
+        public override float CreateVoxelData(Vector3Int position)
         {
-            
-            
             var x = position.x * scale;
             var y = position.y * scale;
             var z = position.z * scale;
@@ -24,7 +23,7 @@ namespace VoxelEngine.Data
 
             intensity += offset;
 
-            return new VoxelData((byte)(intensity * 15), 0);
+            return intensity;
         }
     }
 }
