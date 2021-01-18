@@ -6,24 +6,24 @@ namespace VoxelEngine.Types
 {
     public struct ChunkData
     {
-        public readonly VoxelData[][][] voxels;
+        public readonly byte[][][] voxels;
 
-        public ChunkData(VoxelData[][][] voxels)
+        public ChunkData(byte[][][] voxels)
         {
             this.voxels = voxels;
         }
 
-        public static VoxelData[][][] CreateVoxelArray()
+        public static byte[][][] CreateVoxelArray()
         {
-            var data = new VoxelData[VoxelEngineConstant.ChunkSize][][];
+            var data = new byte[VoxelEngineConstant.ChunkSize][][];
 
             for (int i = 0; i < VoxelEngineConstant.ChunkSize; i++)
             {
-                data[i] = new VoxelData[VoxelEngineConstant.ChunkSize][];
+                data[i] = new byte[VoxelEngineConstant.ChunkSize][];
 
                 for (int j = 0; j < VoxelEngineConstant.ChunkSize; j++)
                 {
-                    data[i][j] = new VoxelData[VoxelEngineConstant.ChunkSize];
+                    data[i][j] = new byte[VoxelEngineConstant.ChunkSize];
                 }
             }
 

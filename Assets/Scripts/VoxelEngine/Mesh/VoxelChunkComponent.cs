@@ -12,7 +12,6 @@ using VoxelEngine.Types;
 
 namespace VoxelEngine.Mesh
 {
-    [ExecuteAlways]
     public class VoxelChunkComponent : MonoBehaviour
     {
         static ProfilerMarker s_InitPerfMarker = new ProfilerMarker("VoxelEngine.Init");
@@ -28,7 +27,7 @@ namespace VoxelEngine.Mesh
         private UnityEngine.Mesh _mesh;
         private MeshFilter _meshFilter;
 
-        private ChunkData _chunkData;
+        private byte[][][] _chunkData;
         private bool _isReady;
     
         // Start is called before the first frame update
@@ -69,8 +68,7 @@ namespace VoxelEngine.Mesh
 
             _meshRenderer.material = material;
             _meshFilter.mesh = _mesh;
-            _mesh.indexFormat = IndexFormat.UInt32;
-            
+
             Profiler.BeginSample("My Sample");
             
             dataGenerator.InitializeGenerator();
@@ -79,19 +77,15 @@ namespace VoxelEngine.Mesh
             Profiler.EndSample();
 
             _isReady = true;
-            
-            GenerateMesh();
         }
 
         public void RefreshChunk()
         {
             if (_isReady)
             {
-                Assert.IsNotNull(_chunkData.voxels);
-
                 s_DataPointPerfMarker.Begin();
                 
-                dataGenerator.RefreshChunkData(ref _chunkData, position);
+                dataGenerator.RefreshChunkData(_chunkData, position);
                 
                 s_DataPointPerfMarker.End();
                 GenerateMesh();
@@ -101,7 +95,7 @@ namespace VoxelEngine.Mesh
         public void GenerateMesh()
         {
             s_MeshGenerationPerfMarker.Begin();
-            VoxelMeshRenderData meshData = meshGenerator.GenerateChunkMesh(ref _chunkData, position);
+            VoxelMeshRenderData meshData = meshGenerator.GenerateChunkMesh(_chunkData, position);
             
             _mesh.Clear();
             

@@ -24,7 +24,7 @@ namespace VoxelEngine.Mesh
 
     public abstract class VoxelChunkMeshGeneratorBase : ScriptableObject
     {
-        public virtual VoxelMeshRenderData GenerateChunkMesh(ref ChunkData chunkData, Vector3Int chunkPosition)
+        public virtual VoxelMeshRenderData GenerateChunkMesh(byte[][][] voxels, Vector3Int chunkPosition)
         {
             VoxelMeshRenderData meshData = new VoxelMeshRenderData(new List<Vector3>(), new List<int>());
 
@@ -41,27 +41,27 @@ namespace VoxelEngine.Mesh
                         dataPoint.y += (chunkPosition.y * VoxelEngineConstant.ChunkSize);
                         dataPoint.z += (chunkPosition.z * VoxelEngineConstant.ChunkSize);
 
-                        var neighbors = new VoxelData[6];
+                        var neighbors = new byte[6];
                         
                         if(x < VoxelEngineConstant.ChunkSize-1)
-                            neighbors[0] = chunkData.voxels[x+1][y][z];
+                            neighbors[0] = voxels[x+1][y][z];
                         
                         if(x > 0)
-                            neighbors[1] = chunkData.voxels[x-1][y][z];
+                            neighbors[1] = voxels[x-1][y][z];
                         
                         if(y < VoxelEngineConstant.ChunkSize-1)
-                            neighbors[2] = chunkData.voxels[x][y+1][z];
+                            neighbors[2] = voxels[x][y+1][z];
                         
                         if(y > 0)
-                            neighbors[3] = chunkData.voxels[x][y-1][z];
+                            neighbors[3] = voxels[x][y-1][z];
                         
                         if(z < VoxelEngineConstant.ChunkSize-1)
-                            neighbors[4] = chunkData.voxels[x][y][z+1];
+                            neighbors[4] = voxels[x][y][z+1];
                         
                         if(z > 0)
-                            neighbors[5] = chunkData.voxels[x][y][z-1];
+                            neighbors[5] = voxels[x][y][z-1];
 
-                        var generatedVoxel = GenerateVoxel(dataPoint, ref chunkData.voxels[x][y][z], neighbors);
+                        var generatedVoxel = GenerateVoxel(dataPoint, ref voxels[x][y][z], neighbors);
 
                         foreach (var triangle in generatedVoxel.triangles)
                         {
@@ -79,6 +79,6 @@ namespace VoxelEngine.Mesh
             return meshData;
         }
 
-        public abstract VoxelMeshRenderData GenerateVoxel(Vector3Int position, ref VoxelData voxel, VoxelData[] neighbors);
+        public abstract VoxelMeshRenderData GenerateVoxel(Vector3Int position, ref byte voxelData, byte[] neighbors);
     }
 }

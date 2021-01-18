@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using VoxelEngine.Data;
 using VoxelEngine.Mesh;
@@ -8,7 +9,6 @@ using VoxelEngine.Types;
 
 namespace VoxelEngine.Mesh
 {
-    [ExecuteAlways]
     public class VoxelChunkManager : MonoBehaviour
     {
         public VoxelChunkMeshGeneratorBase meshGenerator;
@@ -16,7 +16,11 @@ namespace VoxelEngine.Mesh
         public Vector3Int numberOfChunks = Vector3Int.one;
         public Material material;
 
-        private List<VoxelChunkComponent> _chunks = new List<VoxelChunkComponent>();
+        public bool HasChunksToBuild => _chunksToBuild.Any();
+
+        private readonly List<VoxelChunkComponent> _chunks = new List<VoxelChunkComponent>();
+        private Queue<VoxelChunkComponent> _chunksToBuild = new Queue<VoxelChunkComponent>();
+        
         private bool _modifiedSettings = false;
         
         // Start is called before the first frame update
@@ -42,11 +46,26 @@ namespace VoxelEngine.Mesh
                 
                 ChangeNumberOfChunks();
             }
+
+            if (_chunksToBuild.Any())
+            {
+                var chunk = _chunksToBuild.Dequeue();
+                chunk.RefreshChunk();
+            }
         }
 
         private void OnValidate()
         {
             _modifiedSettings = true;
+        }
+        
+        public void RefreshAllChunks()
+        {
+            foreach (var chunk in _chunks)
+            {
+                if(!_chunksToBuild.Contains(chunk))
+                    _chunksToBuild.Enqueue(chunk);
+            }
         }
 
         void AddChunk(Vector3Int position)
@@ -65,6 +84,7 @@ namespace VoxelEngine.Mesh
             chunk.position = position;
             
             _chunks.Add(chunk);
+            _chunksToBuild.Enqueue(chunk);
 
             chunk.Init();
         }
@@ -87,8 +107,6 @@ namespace VoxelEngine.Mesh
                             if (chunk.position == position)
                             {
                                 chunkFound = true;
-                                chunk.RefreshChunk();
-
                                 break;
                             }
                             
