@@ -8,7 +8,6 @@ using Random = UnityEngine.Random;
 
 namespace VoxelEngine.Data
 {
-    [ExecuteInEditMode]
     public abstract class VoxelDataGeneratorBase : ScriptableObject
     {
         public int seed = 0;
@@ -21,15 +20,13 @@ namespace VoxelEngine.Data
 
         void OnValidate()
         {
-            var voxelManager = FindObjectOfType<VoxelChunkManager>();
-
-            if (voxelManager)
+            foreach (var chunkComponent in FindObjectsOfType<VoxelChunkComponent>())
             {
-                voxelManager.RefreshAllChunks();
+                chunkComponent.RefreshChunk();
             }
         }
 
-        public virtual byte[][][] CreateChunkData(Vector3Int chunkPosition)
+        public virtual ChunkData CreateChunkData(Vector3Int chunkPosition)
         {
             var voxels = ChunkData.CreateVoxelArray();
 
@@ -48,15 +45,15 @@ namespace VoxelEngine.Data
 
                         var intensity = (byte) (CreateVoxelData(position) * 15);
 
-                        voxels[x][y][z] = VoxelData.PackData(intensity, 0);
+                        voxels[x][y][z].info = VoxelData.PackData(intensity, 0);
                     }
                 }
             }
 
-            return voxels;
+            return new ChunkData(voxels);
         }
 
-        public virtual void RefreshChunkData(byte[][][] voxels, Vector3Int chunkPosition)
+        public virtual void RefreshChunkData(ref ChunkData chunkData, Vector3Int chunkPosition)
         {
             for (int y = 0; y < VoxelEngineConstant.ChunkSize; y++)
             {
@@ -73,7 +70,7 @@ namespace VoxelEngine.Data
 
                         var intensity = (byte) (CreateVoxelData(position) * 15);
 
-                        voxels[x][y][z] = VoxelData.PackData(intensity, 0);
+                        chunkData.voxels[x][y][z].info = VoxelData.PackData(intensity, 0);
                     }
                 }
             }
