@@ -12,18 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fefe1d658e8b3344b8d69a49f133a3e8, type: 3}
   m_Name: JamesDataGenerator
   m_EditorClassIdentifier: 
-  seed: 1099201
-  scale: 0.0215
-  offset: -0.55
-  surfaceOffset: 1
-  noiseScale: 0.1
+  seed: 59031
+  scale: 0.02115
+  offset: 0
+  noiseScale: 0.75
   octaveCount: 1
-  frequency: 2.3
+  frequency: 2.75
   persistence: 1
   lacunarity: 1
-  surfaceNoiseScale: 1
-  surfaceOctaveCount: 1
-  surfaceFrequency: 1.76
-  surfacePersistence: 0.68
-  surfaceLacunarity: 0.95
-  heightScale: 0.001
+  surfaceBeginLevel: 80
+  hillScale: 0.001
+  hillCutoffScale: 0.1
+  rmfNoiseScale: 0.01
+  rmfHillScale: 2
+  rmfDisplacement: 1
+  rmfFrequency: 0.0001
+  rmfOctaveCount: 9
