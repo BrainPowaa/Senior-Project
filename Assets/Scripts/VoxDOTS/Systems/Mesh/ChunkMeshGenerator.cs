@@ -2,6 +2,8 @@
 using UnityEngine;
 using VoxDOTS.Data;
 using VoxDOTS.Tags;
+using VoxelEngine.Types;
+using ChunkData = VoxDOTS.Data.ChunkData;
 
 namespace VoxDOTS.Systems.Mesh
 {
@@ -13,15 +15,14 @@ namespace VoxDOTS.Systems.Mesh
                 .WithName("Vox_ChunkMeshRender_Update")
                 .WithAll<DirtyChunkTag>()
                 .WithBurst()
-                .ForEach((ref Entity entity) =>//, ref DynamicBuffer<ChunkMeshData> meshData, in DynamicBuffer<ChunkData> chunkData) =>
+                .ForEach((ref Entity entity, in DynamicBuffer<ChunkData> chunkData) =>
                 {
                     //EntityManager.RemoveComponent<DirtyChunkTag>(entity);
                     Debug.Log("TickEntity");
-                    var a = 0;
-                    
-                    for (int i = 0; i < 10000; i++)
+
+                    foreach (var data in chunkData)
                     {
-                        a++;
+                        Debug.Log(data.VoxelData);
                     }
                 }).ScheduleParallel();
         }
