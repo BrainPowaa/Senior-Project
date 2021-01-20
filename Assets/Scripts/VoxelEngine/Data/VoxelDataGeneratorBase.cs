@@ -46,7 +46,7 @@ namespace VoxelEngine.Data
                             z + (chunkPosition.z * VoxelEngineConstant.ChunkSize)
                         );
 
-                        var intensity = (byte) (CreateVoxelData(position) * 15);
+                        var intensity = (byte) (Math.Max(0.0f, Math.Min(CreateVoxelData(position), 1.0f)) * 15);
 
                         voxels[x][y][z] = VoxelData.PackData(intensity, 0);
                     }
@@ -71,7 +71,7 @@ namespace VoxelEngine.Data
                             z + (chunkPosition.z * VoxelEngineConstant.ChunkSize)
                         );
 
-                        var intensity = (byte) (CreateVoxelData(position) * 15);
+                        var intensity = (byte) (Math.Max(0.0f, Math.Min(CreateVoxelData(position), 1.0f)) * 15);
 
                         voxels[x][y][z] = VoxelData.PackData(intensity, 0);
                     }
