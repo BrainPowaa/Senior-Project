@@ -21,10 +21,13 @@ MonoBehaviour:
   persistence: 1
   lacunarity: 1
   surfaceBeginLevel: 80
-  hillScale: 0.001
+  hillScale: 0.19
   hillCutoffScale: 0.1
-  rmfNoiseScale: 0.01
-  rmfHillScale: 2
-  rmfDisplacement: 1
-  rmfFrequency: 0.0001
-  rmfOctaveCount: 9
+  helperNoiseScale: 0.01
+  helperHillScale: 2
+  helperFrequency: 0.0001
+  helperOctaveCount: 1
+  caveNoiseScale: 6.96
+  caveOctaveCount: 1
+  caveFrequency: 3.59
+  caveLacunarity: 1
