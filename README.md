@@ -13,3 +13,12 @@
 - Create a highly performant voxel engine (called VoxDOTS, combines Unity DOTS and Voxel)
 - Create planetoids
 - Make a fun rogue-like procedurally generated game inspired by Astroneer, Risk of Rain 2 and Noita.
+
+## Contributing
+- Install git and git lfs
+- Clone repo
+- Open with Unity 2020.2.1f1 (or later)
+
+## Builds
+There are no available builds at the moment.
+You may find builds shortly!
