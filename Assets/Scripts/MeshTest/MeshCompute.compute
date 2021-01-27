@@ -1,0 +1,19 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+struct Triangle
+{
+    float3 vertices[3];
+};
+
+// Contains 4 bytes (8 bits) packed into a int (32 bits).
+RWStructuredBuffer<int> ChunkData;
+RWStructuredBuffer<Triangle> Triangles;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+
+    Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+}
