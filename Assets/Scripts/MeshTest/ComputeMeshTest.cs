@@ -4,19 +4,18 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 using VoxDOTS;
 
 public class ComputeMeshTest : MonoBehaviour
 {
-    ComputeShader meshGeneratorTest;
-    Material material;
+    public Material drawMeshMaterial;
+    public ComputeShader chunkMeshShader;
 
-    public ComputeShader drawMeshBuffer;
-    public ComputeShader chunkMeshBuffer;
-    
     private ComputeBuffer _chunkDataBuffer, _meshBuffer, _drawCallArgs;
 
     private NativeArray<int> _testChunkData;
+    private static readonly int _meshBufferName = Shader.PropertyToID("MeshBuffer");
 
     [StructLayout(LayoutKind.Sequential)]
     struct DrawArg
@@ -37,11 +36,12 @@ public class ComputeMeshTest : MonoBehaviour
         _testChunkData[3] = 4;
 
         _chunkDataBuffer = new ComputeBuffer(4, sizeof(int));
-        
+
         _drawCallArgs = new ComputeBuffer(1, sizeof(int) * 4);
-        _drawCallArgs.SetData(new[] {new DrawArg {vertexCountPerInstance = 3}});
-        
-        _meshBuffer = new ComputeBuffer(Constants.MaxChunkSize, )
+        _drawCallArgs.SetData(new[] { new DrawArg { vertexCountPerInstance = 3 } });
+
+        // There are 3 floats per triangle, 12 tris per cube (potentially) 
+        _meshBuffer = new ComputeBuffer(Constants.MaxChunkSize, sizeof(float) * 3 * 12);
     }
 
     private void OnDisable()
@@ -49,6 +49,7 @@ public class ComputeMeshTest : MonoBehaviour
         _testChunkData.Dispose();
         _chunkDataBuffer.Dispose();
         _drawCallArgs.Dispose();
+        _meshBuffer.Dispose();
     }
 
     // Update is called once per frame
@@ -56,13 +57,15 @@ public class ComputeMeshTest : MonoBehaviour
     {
         _chunkDataBuffer.SetData(_testChunkData);
         
-        drawMeshBuffer.SetBuffer(0, "MeshBuffer", _chunkDataBuffer);
+        chunkMeshShader.SetBuffer(0, _meshBufferName, _chunkDataBuffer);
+        
+        drawMeshMaterial.SetBuffer(_meshBufferName, _chunkDataBuffer);
 
         Graphics.DrawProceduralIndirect(
-            material, 
-            new Bounds(), 
+            drawMeshMaterial,
+            new Bounds(),
             MeshTopology.Triangles,
-            _drawCallArgs, 
+            _drawCallArgs,
             0
         );
     }
