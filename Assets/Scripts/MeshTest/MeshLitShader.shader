@@ -1,5 +1,6 @@
 Shader "Custom/MeshLitShader"
 {
+<<<<<<< HEAD
     Properties
     {
         _Color ("Color", Color) = (1,1,1,1)
@@ -51,3 +52,69 @@ Shader "Custom/MeshLitShader"
     }
     FallBack "Diffuse"
 }
+=======
+	Properties
+	{
+		_Color ("Color", Color) = (1,1,1,1)
+		_Glossiness ("Smoothness", Range(0,1)) = 0.5
+		_Metallic ("Metallic", Range(0,1)) = 0.0
+	}
+	SubShader
+	{
+		Tags { "RenderType"="MarchingCubes" }
+		
+		CGPROGRAM
+
+		#pragma surface surf Standard fullforwardshadows vertex:vert
+		#pragma target 5.0
+
+		half4 _Color;
+		half _Glossiness;
+		half _Metallic;
+
+		struct v2f 
+		{
+			float4 vertex : SV_POSITION;
+			float3 col : Color;
+		};
+
+		// Vertex input attributes
+	struct Attributes
+	{
+	    uint vertexID : SV_VertexID;
+	    UNITY_VERTEX_INPUT_INSTANCE_ID
+	};
+
+#ifdef SHADER_API_D3D11
+		StructuredBuffer<float3> MeshBuffer;
+#endif
+
+		PackedVaryingsType vert(Attributes IN)
+		{
+#ifdef SHADER_API_D3D11
+			float3 vert = MeshBuffer[IN.vertexID];
+			
+			AttributesMesh OUT;
+			OUT.vertex.xyz = vert;
+
+			return OUT;
+#endif
+		}
+
+		struct Input
+		{
+			float not_in_use;
+		};
+
+		void surf(Input IN, inout SurfaceOutputStandard o)
+		{
+			o.Albedo = _Color.rgb;
+			o.Metallic = _Metallic;
+			o.Smoothness = _Glossiness;
+			o.Alpha = _Color.a;
+		}
+		ENDCG
+	} 
+	FallBack "Diffuse"
+}
+>>>>>>> 573c01e (Voxel Engine: Successful mesh on GPU test, will work on implementing it in the voxel engine)
