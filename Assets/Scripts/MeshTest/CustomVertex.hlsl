@@ -10,6 +10,7 @@ struct Vertex
 {
     float3 position;
     float3 normal;
+    float3 color;
 };
 
 // Vertex input attributes
@@ -19,18 +20,18 @@ struct Attributes
     UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 
-StructuredBuffer<float3> MeshBuffer;
+StructuredBuffer<Vertex> MeshBuffer;
 
 // Custom vertex shader
 PackedVaryingsType CustomVert(Attributes input)
 {
-    const float3 pos = MeshBuffer[input.vertexID];
+    const float3 pos = MeshBuffer[input.vertexID].position;
         
     AttributesMesh am;
     
     am.positionOS = pos;
 #ifdef ATTRIBUTES_NEED_NORMAL
-    am.normalOS = float3(0.0, 1.0, 0.0);
+    am.normalOS = MeshBuffer[input.vertexID].normal;
 #endif
 #ifdef ATTRIBUTES_NEED_TANGENT
     am.tangentOS = 0;
@@ -48,7 +49,7 @@ PackedVaryingsType CustomVert(Attributes input)
     am.uv3 = 0;
 #endif
 #ifdef ATTRIBUTES_NEED_COLOR
-    am.color = 0;
+    am.color.xyz = MeshBuffer[input.vertexID].color;
 #endif
     UNITY_TRANSFER_INSTANCE_ID(input, am);
 

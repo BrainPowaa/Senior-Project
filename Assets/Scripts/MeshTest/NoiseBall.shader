@@ -392,12 +392,13 @@ Shader "NoiseBall"
             #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Lit/ShaderPass/LitSharePass.hlsl"
             #include "Packages/com.unity.render-pipelines.high-definition/Runtime/Material/Lit/LitData.hlsl"
 
-            #include "Packages/com.unity.render-pipelines.high-definition/Runtime/RenderPipeline/ShaderPass/ShaderPassGBuffer.hlsl"
+            // #include "Packages/com.unity.render-pipelines.high-definition/Runtime/RenderPipeline/ShaderPass/ShaderPassGBuffer.hlsl"
 
-            // Custom: Custom vertex shader
+            // Custom
+            #include "CustomFrag.hlsl"
             #include "CustomVertex.hlsl"
             #pragma vertex CustomVert
-            #pragma fragment Frag
+            #pragma fragment CustomFrag
 
             ENDHLSL
         }

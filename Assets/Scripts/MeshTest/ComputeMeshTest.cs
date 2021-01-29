@@ -18,10 +18,14 @@ public class ComputeMeshTest : MonoBehaviour
     public Material drawMeshMaterial;
     public ComputeShader chunkMeshComputeShader;
     
+    public float offsetSpeed = 0.2f;
+
     private ComputeBuffer _chunkDataBuffer, _meshBuffer, _drawArgsBuffer;
 
     private NativeArray<int> _testChunkData;
 
+    private float _offset;
+    
     [StructLayout(LayoutKind.Sequential)]
     struct DrawArg
     {
@@ -33,11 +37,13 @@ public class ComputeMeshTest : MonoBehaviour
 
     void OnEnable()
     {
-        // TEMP: Native arrays are awesome.
-        _testChunkData = new NativeArray<int>(4, Allocator.Persistent);
-
+        _offset = 0f;
+        
         // TEMP: Voxel count, use actual constants later.
         var voxelCount = Constants.MaxChunkSize;
+        
+        // TEMP: Native arrays are awesome.
+        _testChunkData = new NativeArray<int>(voxelCount, Allocator.Persistent);
 
         // Voxel data buffer on the GPU.
         _chunkDataBuffer = new ComputeBuffer(voxelCount, sizeof(int));
@@ -47,8 +53,8 @@ public class ComputeMeshTest : MonoBehaviour
         _drawArgsBuffer.SetData(new[] {new DrawArg {vertexCountPerInstance = 0, instanceCount = 1}});
         
         // Mesh buffer on the GPU.
-        // 12 triangles per voxel (each triangle/stride has 3 floats)
-        _meshBuffer = new ComputeBuffer(voxelCount * 12, sizeof(float) * 3, ComputeBufferType.Append);
+        // Potentially 12 triangles per voxel (each triangle has 3 verts/norms (each is 3+3+4 floats) for a total of 3*(3*2) floats)
+        _meshBuffer = new ComputeBuffer(voxelCount * 12, 3 * (sizeof(float) * 9), ComputeBufferType.Append);
     }
 
     private void OnDisable()
@@ -63,6 +69,15 @@ public class ComputeMeshTest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        _offset += offsetSpeed * Time.deltaTime;
+        for (int i = 0; i < _testChunkData.Length; i++)
+        {
+            var x =  i % Constants.ChunkSize;
+            var y = (i / Constants.ChunkSize) % Constants.ChunkSize;
+            var z =  i / Constants.ChunkSize / Constants.ChunkSize;
+            _testChunkData[i] = (int)((8f * Perlin.Noise(x * 0.1f + _offset, (y + (Mathf.Sin(_offset * 2)*10)) * 0.1f, z * 0.1f )) + 8f);
+        }
+        
         // Test live update.
         _chunkDataBuffer.SetData(_testChunkData);
         
@@ -75,7 +90,7 @@ public class ComputeMeshTest : MonoBehaviour
         chunkMeshComputeShader.SetBuffer(0, "ChunkDataBuffer", _chunkDataBuffer);
         
         // Run voxel mesh generator.
-        chunkMeshComputeShader.Dispatch(0, 1, 1, 1);
+        chunkMeshComputeShader.Dispatch(0, Constants.ChunkSize / 8, Constants.ChunkSize / 8, Constants.ChunkSize / 8);
         
         // Copy appendBuffer count over to vertexCountPerInstance (it is at byte offset 0)
         // However, each entry in the buffer is 1 triangle, so the actual value is 3x greater.
@@ -87,12 +102,12 @@ public class ComputeMeshTest : MonoBehaviour
         // Prepare mesh draw pass.
         drawMeshMaterial.SetPass(0);
         drawMeshMaterial.SetBuffer("MeshBuffer", _meshBuffer);
-
+        
         Graphics.DrawProceduralIndirect(
-            drawMeshMaterial, 
-            new Bounds(transform.position, transform.lossyScale), 
+            drawMeshMaterial,
+            new Bounds(transform.position + new Vector3(4.0f, 4.0f, 4.0f), transform.lossyScale),
             MeshTopology.Triangles,
-            _drawArgsBuffer, 
+            _drawArgsBuffer,
             0
         );
     }
