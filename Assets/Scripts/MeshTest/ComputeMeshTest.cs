@@ -19,6 +19,9 @@ public class ComputeMeshTest : MonoBehaviour
     public ComputeShader chunkMeshComputeShader;
     
     public float offsetSpeed = 0.2f;
+    public float scale = 0.5f;
+    public float height = 0.5f;
+    public float heightScale = 0.5f;
 
     private ComputeBuffer _chunkDataBuffer, _meshBuffer, _drawArgsBuffer;
 
@@ -47,7 +50,7 @@ public class ComputeMeshTest : MonoBehaviour
 
         // Voxel data buffer on the GPU.
         _chunkDataBuffer = new ComputeBuffer(voxelCount, sizeof(int));
-        
+
         // Create buffer that has draw args that will be assigned on the GPU.
         _drawArgsBuffer = new ComputeBuffer(1, sizeof(int) * 4, ComputeBufferType.IndirectArguments);
         _drawArgsBuffer.SetData(new[] {new DrawArg {vertexCountPerInstance = 0, instanceCount = 1}});
@@ -70,13 +73,28 @@ public class ComputeMeshTest : MonoBehaviour
     void Update()
     {
         _offset += offsetSpeed * Time.deltaTime;
+        /*
         for (int i = 0; i < _testChunkData.Length; i++)
         {
             var x =  i % Constants.ChunkSize;
             var y = (i / Constants.ChunkSize) % Constants.ChunkSize;
             var z =  i / Constants.ChunkSize / Constants.ChunkSize;
-            _testChunkData[i] = (int)((8f * Perlin.Noise(x * 0.1f + _offset, (y + (Mathf.Sin(_offset * 2)*10)) * 0.1f, z * 0.1f )) + 8f);
+            _testChunkData[i] = (int)((8f * Perlin.Noise(x * 0.1f + _offset, 0f, z * 0.1f )) + 8f);
+            //_testChunkData[i] = (int)((8f * Perlin.Noise(x * 0.1f + _offset, (y + (Mathf.Sin(_offset * 2)*10)) * 0.1f, z * 0.1f )) + 8f);
+            _testChunkData[i] += (int)(((-y * heightScale) - height));
         }
+        */
+        
+        for (int i = 0; i < _testChunkData.Length; i++)
+        {
+            var x =  i % Constants.ChunkSize;
+            var y = (i / Constants.ChunkSize) % Constants.ChunkSize;
+            var z =  i / Constants.ChunkSize / Constants.ChunkSize;
+            _testChunkData[i] = (int)((64f * (Perlin.Fbm(x * scale + _offset, 0f, z * scale , 2)) + 1f));
+            //_testChunkData[i] = (int)((64f * (Perlin.Noise(x * 0.1f + _offset, (y + (Mathf.Sin(_offset * 2)*10)) * 0.1f, z * 0.1f )) + 1f));
+            _testChunkData[i] += (int)(((-y * heightScale) - height));
+        }
+        
         
         // Test live update.
         _chunkDataBuffer.SetData(_testChunkData);
@@ -102,13 +120,14 @@ public class ComputeMeshTest : MonoBehaviour
         // Prepare mesh draw pass.
         drawMeshMaterial.SetPass(0);
         drawMeshMaterial.SetBuffer("MeshBuffer", _meshBuffer);
-        
-        Graphics.DrawProceduralIndirect(
-            drawMeshMaterial,
-            new Bounds(transform.position + new Vector3(4.0f, 4.0f, 4.0f), transform.lossyScale),
-            MeshTopology.Triangles,
-            _drawArgsBuffer,
-            0
-        );
+
+        for(int i = 0; i < 1; i++)
+            Graphics.DrawProceduralIndirect(
+                drawMeshMaterial,
+                new Bounds(transform.position + new Vector3(4.0f, 4.0f, 4.0f), transform.lossyScale),
+                MeshTopology.Triangles,
+                _drawArgsBuffer,
+                0
+            );
     }
 }

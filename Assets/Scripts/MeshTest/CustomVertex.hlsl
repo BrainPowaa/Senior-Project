@@ -17,7 +17,7 @@ struct Vertex
 struct Attributes
 {
     uint vertexID : SV_VertexID;
-    UNITY_VERTEX_INPUT_INSTANCE_ID
+    uint instanceID : SV_InstanceID;
 };
 
 StructuredBuffer<Vertex> MeshBuffer;
@@ -25,7 +25,9 @@ StructuredBuffer<Vertex> MeshBuffer;
 // Custom vertex shader
 PackedVaryingsType CustomVert(Attributes input)
 {
-    const float3 pos = MeshBuffer[input.vertexID].position;
+    const uint i = input.instanceID;
+    const float3 instancePos = float3(i % 10, (i / 10) % 10, i / 10 / 10);
+    const float3 pos = MeshBuffer[input.vertexID].position + instancePos * 8.f;
         
     AttributesMesh am;
     

@@ -1,0 +1,170 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+#pragma kernel FixupDrawArg
+
+//////// Constants ////////
+
+static const uint CHUNK_SIZE = 32;
+
+//////// Struct Data Containers ////////
+
+struct DrawArg
+{
+    uint vertexCountPerInstance;
+    uint instanceCount;
+    uint startVertexLocation;
+    uint startInstanceLocation;
+};
+
+struct Vertex
+{
+    float3 position;
+    float3 normal;
+    float3 color;
+};
+
+struct Triangle
+{
+    Vertex vertices[3];
+};
+
+//////// Buffers ////////
+
+RWStructuredBuffer<int> ChunkDataBuffer;
+AppendStructuredBuffer<Triangle> MeshBuffer;
+RWStructuredBuffer<DrawArg> DrawArgsBuffer;
+
+//////// Lookup Tables ////////
+
+static float3 NormalDirLookup[6] =
+{
+    float3( 1.0f,  0.0f,  0.0f),
+    float3(-1.0f,  0.0f,  0.0f),
+    float3( 0.0f,  1.0f,  0.0f),
+    float3( 0.0f, -1.0f,  0.0f),
+    float3( 0.0f,  0.0f,  1.0f),
+    float3( 0.0f,  0.0f, -1.0f)
+};
+
+static float3 CubeFaceDirLookup[36] =
+{
+    // X+
+    float3(1.0f, 0.0f, 0.0f),
+    float3(1.0f, 1.0f, 0.0f),
+    float3(1.0f, 0.0f, 1.0f),
+
+    float3(1.0f, 1.0f, 1.0f),
+    float3(1.0f, 0.0f, 1.0f),
+    float3(1.0f, 1.0f, 0.0f),
+    
+    // X-
+    float3(0.0f, 0.0f, 0.0f),
+    float3(0.0f, 0.0f, 1.0f),
+    float3(0.0f, 1.0f, 0.0f),
+
+    float3(0.0f, 1.0f, 1.0f),
+    float3(0.0f, 1.0f, 0.0f),
+    float3(0.0f, 0.0f, 1.0f),
+    
+    // Y+
+    float3(0.0f, 1.0f, 0.0f),
+    float3(0.0f, 1.0f, 1.0f),
+    float3(1.0f, 1.0f, 0.0f),
+
+    float3(1.0f, 1.0f, 1.0f),
+    float3(1.0f, 1.0f, 0.0f),
+    float3(0.0f, 1.0f, 1.0f),
+    
+    // Y-
+    float3(0.0f, 0.0f, 0.0f),
+    float3(1.0f, 0.0f, 0.0f),
+    float3(0.0f, 0.0f, 1.0f),
+
+    float3(1.0f, 0.0f, 1.0f),
+    float3(0.0f, 0.0f, 1.0f),
+    float3(1.0f, 0.0f, 0.0f),
+    
+    // Z+
+    float3(0.0f, 0.0f, 1.0f),
+    float3(1.0f, 0.0f, 1.0f),
+    float3(0.0f, 1.0f, 1.0f),
+
+    float3(1.0f, 1.0f, 1.0f),
+    float3(0.0f, 1.0f, 1.0f),
+    float3(1.0f, 0.0f, 1.0f),
+    
+    // Z-
+    float3(0.0f, 0.0f, 0.0f),
+    float3(0.0f, 1.0f, 0.0f),
+    float3(1.0f, 0.0f, 0.0f),
+
+    float3(1.0f, 1.0f, 0.0f),
+    float3(1.0f, 0.0f, 0.0f),
+    float3(0.0f, 1.0f, 0.0f),
+};
+
+//////// Triangle Helpers ////////
+
+// Creates a face from 2 triangles and a direction.
+void CreateCubeFace(uint dir, uint3 p, int voxelIso)
+{
+    const float3 normal = NormalDirLookup[dir];
+    const uint dirLookup = dir * 6;
+    
+    const float3 col = (float3(voxelIso, voxelIso, voxelIso)) / 32.f;
+    const float3 size = saturate(col * 2) * 1.f;
+
+    Triangle tri_a;
+    
+    tri_a.vertices[0].position = (CubeFaceDirLookup[dirLookup]     * size) + p,
+    tri_a.vertices[1].position = (CubeFaceDirLookup[dirLookup + 1] * size) + p,
+    tri_a.vertices[2].position = (CubeFaceDirLookup[dirLookup + 2] * size) + p,
+    
+    tri_a.vertices[0].normal = normal;
+    tri_a.vertices[1].normal = normal;
+    tri_a.vertices[2].normal = normal;
+    
+    tri_a.vertices[0].color = col;
+    tri_a.vertices[1].color = col;
+    tri_a.vertices[2].color = col;
+
+    Triangle tri_b;
+
+    tri_b.vertices[0].position = (CubeFaceDirLookup[dirLookup + 3] * size) + p,
+    tri_b.vertices[1].position = (CubeFaceDirLookup[dirLookup + 4] * size) + p,
+    tri_b.vertices[2].position = (CubeFaceDirLookup[dirLookup + 5] * size) + p,
+
+    tri_b.vertices[0].normal = normal;
+    tri_b.vertices[1].normal = normal;
+    tri_b.vertices[2].normal = normal;
+
+    tri_b.vertices[0].color = col;
+    tri_b.vertices[1].color = col;
+    tri_b.vertices[2].color = col;
+
+    MeshBuffer.Append(tri_a);
+    MeshBuffer.Append(tri_b);
+}
+
+// Main
+[numthreads(8,8,8)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    const uint index = id.x + (id.y * CHUNK_SIZE) + (id.z * CHUNK_SIZE * CHUNK_SIZE);
+    
+    const int voxelIso = ChunkDataBuffer[index];
+
+    CreateCubeFace(0, id, voxelIso);
+    CreateCubeFace(1, id, voxelIso);
+    CreateCubeFace(2, id, voxelIso);
+    CreateCubeFace(3, id, voxelIso);
+    CreateCubeFace(4, id, voxelIso);
+    CreateCubeFace(5, id, voxelIso);
+}
+
+// Fixes incorrect count gathered by ComputeBuffer.CopyCount()
+[numthreads(1,1,1)]
+void FixupDrawArg()
+{
+    DrawArgsBuffer[0].vertexCountPerInstance *= 3;
+}

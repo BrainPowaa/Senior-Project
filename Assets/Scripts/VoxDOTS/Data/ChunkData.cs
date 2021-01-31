@@ -1,4 +1,7 @@
-﻿using Unity.Entities;
+﻿using System.Drawing;
+using System.Numerics;
+using Unity.Entities;
+using Unity.Mathematics;
 
 namespace VoxDOTS.Data
 {
@@ -9,4 +12,9 @@ namespace VoxDOTS.Data
 
         public ChunkData(byte value) => (Value) = (value);
     }
+}
+
+public struct Voxel
+{
+    public byte Value;
 }
