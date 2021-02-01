@@ -1,0 +1,52 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel UpdateVoxelData
+#pragma kernel TEMPNewChunk
+
+#include "FastNoiseLite.hlsl"
+
+fnl_state TestCreateState(int seed)
+{
+    fnl_state newState;
+    newState.seed = seed;
+    newState.frequency = 0.05f;
+    newState.noise_type = FNL_NOISE_OPENSIMPLEX2;
+    newState.rotation_type_3d = FNL_ROTATION_NONE;
+    newState.fractal_type = FNL_FRACTAL_NONE;
+    newState.octaves = 3;
+    newState.lacunarity = 2.0f;
+    newState.gain = 0.5f;
+    newState.weighted_strength = 0.0f;
+    newState.ping_pong_strength = 2.0f;
+    newState.cellular_distance_func = FNL_CELLULAR_DISTANCE_EUCLIDEANSQ; // 1
+    newState.cellular_return_type = FNL_CELLULAR_RETURN_TYPE_DISTANCE; // 1
+    newState.cellular_jitter_mod = 1.0f;
+    newState.domain_warp_amp = 30.0f;
+    newState.domain_warp_type = FNL_DOMAIN_WARP_OPENSIMPLEX2;
+    return newState;
+}
+
+//////// Constants ////////
+
+static fnl_state STATE = TestCreateState(1337);
+
+static const uint CHUNK_SIZE = 32;
+
+//////// Buffers ////////
+
+RWStructuredBuffer<int> ChunkDataBuffer;
+RWStructuredBuffer<int> Offset;
+
+// Main
+[numthreads(8,8,8)]
+void UpdateVoxelData(uint3 id : SV_DispatchThreadID)
+{
+    const uint index = id.x + (id.y * CHUNK_SIZE) + (id.z * CHUNK_SIZE * CHUNK_SIZE);
+    ChunkDataBuffer[index] = fnlGetNoise3D(STATE, id.x + Offset[0]/10.f, id.y, id.z) * 32.f;
+}
+
+//TEMP
+[numthreads(1,1,1)]
+void TEMPNewChunk(uint3 id : SV_DispatchThreadID)
+{
+    Offset[0] += 1;
+}

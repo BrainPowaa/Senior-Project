@@ -17,13 +17,14 @@ public class ComputeMeshTest : MonoBehaviour
 {
     public Material drawMeshMaterial;
     public ComputeShader chunkMeshComputeShader;
+    public ComputeShader chunkDataComputeShader;
     
     public float offsetSpeed = 0.2f;
     public float scale = 0.5f;
     public float height = 0.5f;
     public float heightScale = 0.5f;
 
-    private ComputeBuffer _chunkDataBuffer, _meshBuffer, _drawArgsBuffer;
+    private ComputeBuffer _chunkDataBuffer, _meshBuffer, _drawArgsBuffer, _tempOffsetBuffer, _fnlStateBuffer;
 
     private NativeArray<int> _testChunkData;
 
@@ -58,6 +59,10 @@ public class ComputeMeshTest : MonoBehaviour
         // Mesh buffer on the GPU.
         // Potentially 12 triangles per voxel (each triangle has 3 verts/norms (each is 3+3+4 floats) for a total of 3*(3*2) floats)
         _meshBuffer = new ComputeBuffer(voxelCount * 12, 3 * (sizeof(float) * 9), ComputeBufferType.Append);
+        
+        // TEMP: Offset buffer
+        _tempOffsetBuffer = new ComputeBuffer(1, sizeof(int));
+        _tempOffsetBuffer.SetData(new int[] {1});
     }
 
     private void OnDisable()
@@ -67,6 +72,7 @@ public class ComputeMeshTest : MonoBehaviour
         _chunkDataBuffer.Release();
         _drawArgsBuffer.Release();
         _meshBuffer.Release();
+        _tempOffsetBuffer.Release();
     }
 
     // Update is called once per frame
@@ -85,6 +91,7 @@ public class ComputeMeshTest : MonoBehaviour
         }
         */
         
+        /*
         for (int i = 0; i < _testChunkData.Length; i++)
         {
             var x =  i % Constants.ChunkSize;
@@ -98,7 +105,17 @@ public class ComputeMeshTest : MonoBehaviour
         
         // Test live update.
         _chunkDataBuffer.SetData(_testChunkData);
+        */
         
+        // Assign buffers.
+        chunkDataComputeShader.SetBuffer(0, "ChunkDataBuffer", _chunkDataBuffer);
+        chunkDataComputeShader.SetBuffer(0, "Offset", _tempOffsetBuffer);
+        chunkDataComputeShader.SetBuffer(1, "Offset", _tempOffsetBuffer);
+        
+        // Run voxel data generator.
+        chunkDataComputeShader.Dispatch(0, Constants.ChunkSize / 8, Constants.ChunkSize / 8, Constants.ChunkSize / 8);
+        chunkDataComputeShader.Dispatch(1, 1, 1, 1);
+
         // Reset mesh counter for new writes.
         _meshBuffer.SetCounterValue(0);
         
