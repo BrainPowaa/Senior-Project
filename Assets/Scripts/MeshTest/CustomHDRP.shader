@@ -1,7 +1,7 @@
 // Most parts of this shader are simply copy-pasted from the HDRP Lit shader.
 // See "Custom:" for modifications from the original shader.
 
-Shader "NoiseBall"
+Shader "CustomHDRP"
 {
     Properties
     {
