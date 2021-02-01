@@ -7,13 +7,6 @@
 <img src="https://img.shields.io/github/last-commit/BrainPowaa/Senior-Project">
 </p>
 
-## Goals
-
-- Learn Unity DOTS architecture (ECS, Jobs System, Entity components)
-- Create a highly performant voxel engine (called VoxDOTS, combines Unity DOTS and Voxel)
-- Create planetoids
-- Make a fun rogue-like procedurally generated game inspired by Astroneer, Risk of Rain 2 and Noita.
-
 ## Contributing
 - Install git and git lfs
 - Clone repo
