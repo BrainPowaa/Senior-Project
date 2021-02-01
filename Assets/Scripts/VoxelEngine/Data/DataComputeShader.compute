@@ -1,0 +1,64 @@
+#include "FastNoiseLite.hlsl"
+#pragma kernel CSMain
+const int seed = 42069;
+const float scale = 0.015;
+RWStructuredBuffer<int> ChunkDataBuffer;
+RWStructuredBuffer<int> Offset;
+static const uint CHUNK_SIZE = 32;
+[numthreads(8,8,8)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+
+    int surfaceBeginLevel = 80;
+    float hillScale = 0.001f;
+    float secondaryHillScale = 2.0f;
+    float hillCutoffScale = 0.1f;
+    float secondaryHillNoiseScale = 0.01f;
+
+    float caveNoiseScale = 1.0f;
+    float caveFrequency = 1.0f;
+        
+    fnl_state surfaceNoise1 = fnlCreateState(seed);
+    fnl_state surfaceNoise2 = fnlCreateState(seed/2);
+    
+    // FastNoiseCave caveNoise1 = new FastNoiseCave();
+    // FastNoiseCave caveNoise2 = new FastNoiseCave();
+
+    float x = id.x * scale;
+    float y = id.y * scale;
+    float z = id.z * scale;
+            
+            
+    // Hill Generation      
+    float hills = (((float)fnlGetNoise3D(surfaceNoise1, x, surfaceBeginLevel, z) * hillScale) -((id.y - surfaceBeginLevel) * hillCutoffScale));
+    hills += (((float) fnlGetNoise3D(surfaceNoise2, x, surfaceBeginLevel, z) * secondaryHillScale) -((id.y - surfaceBeginLevel) * secondaryHillNoiseScale));
+    hills = min(max(hills, -1.0f), 1.0f);
+
+            
+    // Cave Generation
+    // caveNoise1.SetSeed(seed);
+    // caveNoise2.SetSeed(seed/2);
+    //         
+    // caveNoise1.SetCellularJitter(0.3f);
+    // caveNoise2.SetCellularJitter(0.3f);
+    //         
+    // caveNoise1.SetFrequency(caveFrequency);
+    // caveNoise2.SetFrequency(caveFrequency);
+    //
+    // caveNoise1.SetCellularReturnType(FastNoiseCave.CellularReturnType.Distance2Div);
+    // caveNoise2.SetCellularReturnType(FastNoiseCave.CellularReturnType.Distance2Div);
+    //
+    //
+    // float caveNoiseValue1 = caveNoise1.GetCellular(x, y, z);
+    // x += caveFrequency * 0.5f;
+    // y += caveFrequency * 0.5f;
+    // z += caveFrequency * 0.5f;
+    // float caveNoiseValue2 = caveNoise2.GetCellular(x, y, z);
+    //
+    // float caveNoiseValue = min(caveNoiseValue1, caveNoiseValue2);
+    // caveNoiseValue = min(max(caveNoiseValue, -1.0f), 1.0f);
+    // float caves = (caveNoiseValue * caveNoiseScale);
+    
+    const uint index = id.x + (id.y * CHUNK_SIZE) + (id.z * CHUNK_SIZE * CHUNK_SIZE);
+    ChunkDataBuffer[index] = hills;
+}
