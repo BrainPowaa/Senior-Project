@@ -1,4 +1,4 @@
-<image src = "../blob/master/.github/images/voxdotslogo.png"></image>
+<image src = "https://media.githubusercontent.com/media/BrainPowaa/Senior-Project/master/.github/images/voxdotslogo.png?token=ABZBW5XMQEXU5JANH5YBUKTADAYWC"></image>
 <br><br>
 
 <h1 align=center>Senior Seminar Project: Voxel Game</h1>
