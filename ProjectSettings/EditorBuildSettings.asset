@@ -5,7 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ChunkTestScene.unity
     guid: 5b57ec17c54f63647ae6d00768ea211a
+  - enabled: 0
+    path: Assets/Scripts/VoxDOTS/Testing/ChunkTest/ChunkStressTest.unity
+    guid: d18cc2074e97e8143a641ea420c1f3f4
+  - enabled: 1
+    path: Assets/Scripts/MeshTest/MeshTest.unity
+    guid: c4e30300b5bd76c4f8e7eb48317f7f8a
   m_configObjects: {}

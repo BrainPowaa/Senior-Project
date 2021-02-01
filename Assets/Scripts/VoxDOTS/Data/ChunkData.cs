@@ -1,11 +1,20 @@
-﻿using Unity.Entities;
+﻿using System.Drawing;
+using System.Numerics;
+using Unity.Entities;
+using Unity.Mathematics;
 
 namespace VoxDOTS.Data
 {
-    [GenerateAuthoringComponent]
     [InternalBufferCapacity(Constants.MaxChunkSize)]
     public struct ChunkData : IBufferElementData
     {
-        public byte VoxelData;
+        public byte Value;
+
+        public ChunkData(byte value) => (Value) = (value);
     }
+}
+
+public struct Voxel
+{
+    public byte Value;
 }
