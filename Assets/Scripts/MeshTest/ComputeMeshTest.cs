@@ -18,18 +18,11 @@ public class ComputeMeshTest : MonoBehaviour
     public Material drawMeshMaterial;
     public ComputeShader chunkMeshComputeShader;
     public ComputeShader chunkDataComputeShader;
-    
-    public float offsetSpeed = 0.2f;
-    public float scale = 0.5f;
-    public float height = 0.5f;
-    public float heightScale = 0.5f;
 
-    private ComputeBuffer _chunkDataBuffer, _meshBuffer, _drawArgsBuffer, _tempOffsetBuffer, _fnlStateBuffer;
+    public Vector3Int chunkCount = new Vector3Int(1, 1, 1);
 
-    private NativeArray<int> _testChunkData;
+    private ComputeBuffer _chunkDataBuffer, _meshBuffer, _drawArgsBuffer, _tempOffsetBuffer;
 
-    private float _offset;
-    
     [StructLayout(LayoutKind.Sequential)]
     struct DrawArg
     {
@@ -41,13 +34,8 @@ public class ComputeMeshTest : MonoBehaviour
 
     void OnEnable()
     {
-        _offset = 0f;
-        
         // TEMP: Voxel count, use actual constants later.
-        var voxelCount = Constants.MaxChunkSize;
-        
-        // TEMP: Native arrays are awesome.
-        _testChunkData = new NativeArray<int>(voxelCount, Allocator.Persistent);
+        int voxelCount = Constants.MaxChunkSize * chunkCount.x * chunkCount.y * chunkCount.z;
 
         // Voxel data buffer on the GPU.
         _chunkDataBuffer = new ComputeBuffer(voxelCount, sizeof(int));
@@ -59,61 +47,33 @@ public class ComputeMeshTest : MonoBehaviour
         // Mesh buffer on the GPU.
         // Potentially 12 triangles per voxel (each triangle has 3 verts/norms (each is 3+3+4 floats) for a total of 3*(3*2) floats)
         _meshBuffer = new ComputeBuffer(voxelCount * 12, 3 * (sizeof(float) * 9), ComputeBufferType.Append);
-        
-        // TEMP: Offset buffer
-        _tempOffsetBuffer = new ComputeBuffer(1, sizeof(int));
-        _tempOffsetBuffer.SetData(new int[] {1});
+
+        _tempOffsetBuffer = new ComputeBuffer(1, sizeof(float));
+
+        //UpdateBuffers();
     }
 
     private void OnDisable()
     {
-        // Cleanup GPU / Native buffers.
-        _testChunkData.Dispose();
         _chunkDataBuffer.Release();
         _drawArgsBuffer.Release();
         _meshBuffer.Release();
         _tempOffsetBuffer.Release();
     }
 
-    // Update is called once per frame
-    void Update()
+    void UpdateBuffers()
     {
-        _offset += offsetSpeed * Time.deltaTime;
-        /*
-        for (int i = 0; i < _testChunkData.Length; i++)
-        {
-            var x =  i % Constants.ChunkSize;
-            var y = (i / Constants.ChunkSize) % Constants.ChunkSize;
-            var z =  i / Constants.ChunkSize / Constants.ChunkSize;
-            _testChunkData[i] = (int)((8f * Perlin.Noise(x * 0.1f + _offset, 0f, z * 0.1f )) + 8f);
-            //_testChunkData[i] = (int)((8f * Perlin.Noise(x * 0.1f + _offset, (y + (Mathf.Sin(_offset * 2)*10)) * 0.1f, z * 0.1f )) + 8f);
-            _testChunkData[i] += (int)(((-y * heightScale) - height));
-        }
-        */
-        
-        /*
-        for (int i = 0; i < _testChunkData.Length; i++)
-        {
-            var x =  i % Constants.ChunkSize;
-            var y = (i / Constants.ChunkSize) % Constants.ChunkSize;
-            var z =  i / Constants.ChunkSize / Constants.ChunkSize;
-            _testChunkData[i] = (int)((64f * (Perlin.Fbm(x * scale + _offset, 0f, z * scale , 2)) + 1f));
-            //_testChunkData[i] = (int)((64f * (Perlin.Noise(x * 0.1f + _offset, (y + (Mathf.Sin(_offset * 2)*10)) * 0.1f, z * 0.1f )) + 1f));
-            _testChunkData[i] += (int)(((-y * heightScale) - height));
-        }
-        
-        
-        // Test live update.
-        _chunkDataBuffer.SetData(_testChunkData);
-        */
+        var threadsX = (Constants.ChunkSize / 8) * chunkCount.x;
+        var threadsY = (Constants.ChunkSize / 8) * chunkCount.y;
+        var threadsZ = (Constants.ChunkSize / 8) * chunkCount.z;
         
         // Assign buffers.
         chunkDataComputeShader.SetBuffer(0, "ChunkDataBuffer", _chunkDataBuffer);
         chunkDataComputeShader.SetBuffer(0, "Offset", _tempOffsetBuffer);
         chunkDataComputeShader.SetBuffer(1, "Offset", _tempOffsetBuffer);
-        
+
         // Run voxel data generator.
-        chunkDataComputeShader.Dispatch(0, Constants.ChunkSize / 8, Constants.ChunkSize / 8, Constants.ChunkSize / 8);
+        chunkDataComputeShader.Dispatch(0, threadsX, threadsY, threadsZ);
         chunkDataComputeShader.Dispatch(1, 1, 1, 1);
 
         // Reset mesh counter for new writes.
@@ -125,7 +85,7 @@ public class ComputeMeshTest : MonoBehaviour
         chunkMeshComputeShader.SetBuffer(0, "ChunkDataBuffer", _chunkDataBuffer);
         
         // Run voxel mesh generator.
-        chunkMeshComputeShader.Dispatch(0, Constants.ChunkSize / 8, Constants.ChunkSize / 8, Constants.ChunkSize / 8);
+        chunkMeshComputeShader.Dispatch(0, threadsX, threadsY, threadsZ);
         
         // Copy appendBuffer count over to vertexCountPerInstance (it is at byte offset 0)
         // However, each entry in the buffer is 1 triangle, so the actual value is 3x greater.
@@ -135,16 +95,23 @@ public class ComputeMeshTest : MonoBehaviour
         chunkMeshComputeShader.Dispatch(1, 1, 1, 1);
         
         // Prepare mesh draw pass.
+        drawMeshMaterial.SetBuffer("MeshBuffer", _meshBuffer);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        UpdateBuffers();
+        
         drawMeshMaterial.SetPass(0);
         drawMeshMaterial.SetBuffer("MeshBuffer", _meshBuffer);
 
-        for(int i = 0; i < 1; i++)
-            Graphics.DrawProceduralIndirect(
-                drawMeshMaterial,
-                new Bounds(transform.position + new Vector3(4.0f, 4.0f, 4.0f), transform.lossyScale),
-                MeshTopology.Triangles,
-                _drawArgsBuffer,
-                0
-            );
+        Graphics.DrawProceduralIndirect(
+            drawMeshMaterial,
+            new Bounds(transform.position + new Vector3(4.0f, 4.0f, 4.0f), transform.lossyScale),
+            MeshTopology.Triangles,
+            _drawArgsBuffer,
+            0
+        );
     }
 }

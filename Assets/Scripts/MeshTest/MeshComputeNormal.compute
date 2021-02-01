@@ -4,7 +4,7 @@
 
 //////// Constants ////////
 
-static const uint CHUNK_SIZE = 32;
+static const uint CHUNK_SIZE = 32*3;
 
 //////// Struct Data Containers ////////
 

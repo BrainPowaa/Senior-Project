@@ -29,7 +29,8 @@ fnl_state TestCreateState(int seed)
 
 static fnl_state STATE = TestCreateState(1337);
 
-static const uint CHUNK_SIZE = 32;
+static const uint CHUNK_SIZE = 32*3;
+static const uint3 CENTER = uint3(48, 48, 48);
 
 //////// Buffers ////////
 
@@ -41,7 +42,7 @@ RWStructuredBuffer<int> Offset;
 void UpdateVoxelData(uint3 id : SV_DispatchThreadID)
 {
     const uint index = id.x + (id.y * CHUNK_SIZE) + (id.z * CHUNK_SIZE * CHUNK_SIZE);
-    ChunkDataBuffer[index] = fnlGetNoise3D(STATE, id.x + Offset[0]/10.f, id.y, id.z) * 32.f;
+    ChunkDataBuffer[index] = (fnlGetNoise3D(STATE, id.x + Offset[0]/10.f, id.y, id.z) * 32.f) + (400 - distance(id, CENTER) * 10);
 }
 
 //TEMP
