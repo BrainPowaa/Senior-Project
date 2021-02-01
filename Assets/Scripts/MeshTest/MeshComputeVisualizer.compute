@@ -154,12 +154,15 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     
     const int voxelIso = ChunkDataBuffer[index];
 
-    CreateCubeFace(0, id, voxelIso);
-    CreateCubeFace(1, id, voxelIso);
-    CreateCubeFace(2, id, voxelIso);
-    CreateCubeFace(3, id, voxelIso);
-    CreateCubeFace(4, id, voxelIso);
-    CreateCubeFace(5, id, voxelIso);
+    if(voxelIso > 1)
+    {
+        CreateCubeFace(0, id, voxelIso);
+        CreateCubeFace(1, id, voxelIso);
+        CreateCubeFace(2, id, voxelIso);
+        CreateCubeFace(3, id, voxelIso);
+        CreateCubeFace(4, id, voxelIso);
+        CreateCubeFace(5, id, voxelIso);
+    }
 }
 
 // Fixes incorrect count gathered by ComputeBuffer.CopyCount()
