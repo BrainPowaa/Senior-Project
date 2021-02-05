@@ -9,8 +9,13 @@ float4x4 _LocalToWorld;
 struct Vertex
 {
     float3 position;
+};
+
+struct Triangle
+{
     float3 normal;
     float3 color;
+    Vertex vertices[3];
 };
 
 // Vertex input attributes
@@ -20,25 +25,19 @@ struct Attributes
     uint instanceID : SV_InstanceID;
 };
 
-StructuredBuffer<Vertex> MeshBuffer;
+StructuredBuffer<Triangle> MeshBuffer;
 
 // Custom vertex shader
 PackedVaryingsType CustomVert(Attributes input)
 {
-    const float3 instancePos = float3
-    (
-         input.instanceID % 10,
-        (input.instanceID / 10) % 10,
-         input.instanceID / 10 / 10
-    );
-    
-    const float3 pos = MeshBuffer[input.vertexID].position + instancePos * 32.f;
-        
     AttributesMesh am;
+
+    const Triangle tri = MeshBuffer[input.vertexID / 3];
+    const Vertex vert = tri.vertices[input.vertexID % 3];
     
-    am.positionOS = pos;
+    am.positionOS = vert.position;
 #ifdef ATTRIBUTES_NEED_NORMAL
-    am.normalOS = MeshBuffer[input.vertexID].normal;
+    am.normalOS = tri.normal;
 #endif
 #ifdef ATTRIBUTES_NEED_TANGENT
     am.tangentOS = 0;
@@ -56,7 +55,7 @@ PackedVaryingsType CustomVert(Attributes input)
     am.uv3 = 0;
 #endif
 #ifdef ATTRIBUTES_NEED_COLOR
-    am.color.xyz = MeshBuffer[input.vertexID].color;
+    am.color.xyz = tri.color;
 #endif
     UNITY_TRANSFER_INSTANCE_ID(input, am);
 

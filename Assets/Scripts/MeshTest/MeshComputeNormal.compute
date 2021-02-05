@@ -4,7 +4,9 @@
 
 //////// Constants ////////
 
-static const uint CHUNK_SIZE = 32*3;
+int ChunkX;
+int ChunkY;
+int ChunkZ;
 
 //////// Struct Data Containers ////////
 
@@ -19,12 +21,12 @@ struct DrawArg
 struct Vertex
 {
     float3 position;
-    float3 normal;
-    float3 color;
 };
 
 struct Triangle
 {
+    float3 normal;
+    float3 color;
     Vertex vertices[3];
 };
 
@@ -36,7 +38,7 @@ RWStructuredBuffer<DrawArg> DrawArgsBuffer;
 
 //////// Lookup Tables ////////
 
-static float3 NormalDirLookup[6] =
+static const float3 NormalDirLookup[6] =
 {
     float3( 1.0f,  0.0f,  0.0f),
     float3(-1.0f,  0.0f,  0.0f),
@@ -46,7 +48,7 @@ static float3 NormalDirLookup[6] =
     float3( 0.0f,  0.0f, -1.0f)
 };
 
-static float3 CubeFaceDirLookup[36] =
+static const float3 CubeFaceDirLookup[36] =
 {
     // X+
     float3(1.0f, 0.0f, 0.0f),
@@ -117,13 +119,8 @@ void CreateCubeFace(uint dir, uint3 p, float3 col)
     tri_a.vertices[1].position = CubeFaceDirLookup[dirLookup + 1] + p,
     tri_a.vertices[2].position = CubeFaceDirLookup[dirLookup + 2] + p,
     
-    tri_a.vertices[0].normal = normal;
-    tri_a.vertices[1].normal = normal;
-    tri_a.vertices[2].normal = normal;
-    
-    tri_a.vertices[0].color = col;
-    tri_a.vertices[1].color = col;
-    tri_a.vertices[2].color = col;
+    tri_a.normal = normal;
+    tri_a.color = col;
 
     Triangle tri_b;
 
@@ -131,13 +128,8 @@ void CreateCubeFace(uint dir, uint3 p, float3 col)
     tri_b.vertices[1].position = CubeFaceDirLookup[dirLookup + 4] + p,
     tri_b.vertices[2].position = CubeFaceDirLookup[dirLookup + 5] + p,
 
-    tri_b.vertices[0].normal = normal;
-    tri_b.vertices[1].normal = normal;
-    tri_b.vertices[2].normal = normal;
-
-    tri_b.vertices[0].color = col;
-    tri_b.vertices[1].color = col;
-    tri_b.vertices[2].color = col;
+    tri_b.normal = normal;
+    tri_b.color = col;
 
     MeshBuffer.Append(tri_a);
     MeshBuffer.Append(tri_b);
@@ -147,30 +139,30 @@ void CreateCubeFace(uint dir, uint3 p, float3 col)
 [numthreads(8,8,8)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    const uint index = id.x + (id.y * CHUNK_SIZE) + (id.z * CHUNK_SIZE * CHUNK_SIZE);
+    const uint index = id.x + (id.z * ChunkX) + (id.y * ChunkX * ChunkZ);
     
     const int voxelIso = ChunkDataBuffer[index];
 
     if(voxelIso > 8)
     {
-        const float3 col = (float3(voxelIso, voxelIso, voxelIso) - 8.f) / 8.f;
+        const float3 col = 1.f;
 
-        if(id.x > (CHUNK_SIZE-2) || ChunkDataBuffer[index + 1] <= 8)
+        if(id.x > (ChunkX-2) || ChunkDataBuffer[index + 1] <= 8)
             CreateCubeFace(0, id, col);
         
         if(id.x < 1 || ChunkDataBuffer[index - 1] <= 8)
             CreateCubeFace(1, id, col);
-       
-        if(id.y > (CHUNK_SIZE-2) || ChunkDataBuffer[index + CHUNK_SIZE] <= 8)
+
+        if(id.y > (ChunkY-2) || ChunkDataBuffer[index + ChunkX * ChunkZ] <= 8)
             CreateCubeFace(2, id, col);
-       
-        if(id.y < 1 || ChunkDataBuffer[index - CHUNK_SIZE] <= 8)
+        
+        if(id.y < 1 || ChunkDataBuffer[index - ChunkX * ChunkZ] <= 8)
             CreateCubeFace(3, id, col);
-        
-        if(id.z > (CHUNK_SIZE-2) || ChunkDataBuffer[index + CHUNK_SIZE * CHUNK_SIZE] <= 8)
+       
+        if(id.z > (ChunkZ-2) || ChunkDataBuffer[index + ChunkX] <= 8)
             CreateCubeFace(4, id, col);
-        
-        if(id.z < 1 || ChunkDataBuffer[index - CHUNK_SIZE * CHUNK_SIZE] <= 8)
+       
+        if(id.z < 1 || ChunkDataBuffer[index - ChunkX] <= 8)
             CreateCubeFace(5, id, col);
     }
 }
