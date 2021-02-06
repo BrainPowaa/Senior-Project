@@ -4,9 +4,7 @@
 
 #include "FastNoiseLite.hlsl"
 
-int ChunkX;
-int ChunkY;
-int ChunkZ;
+static uint3 ChunkSize = uint3(64 * 10, 64 * 1, 64 * 10);
 
 fnl_state TestCreateState(int seed)
 {
@@ -66,7 +64,7 @@ void UpdateVoxelData(uint3 id : SV_DispatchThreadID)
     noise += (48 - (id.y*1.f));
     noise = max(noise, 10.f - id.y);
     
-    const uint index = id.x + (id.z * ChunkX) + (id.y * ChunkX * ChunkZ);
+    const uint index = id.x + (id.z * ChunkSize.x) + (id.y * ChunkSize.x * ChunkSize.z);
 
     ChunkDataBuffer[index] = noise;
 

@@ -4,9 +4,7 @@
 
 //////// Constants ////////
 
-int ChunkX;
-int ChunkY;
-int ChunkZ;
+static uint3 ChunkSize = uint3(64 * 10, 64 * 1, 64 * 10);
 
 //////// Struct Data Containers ////////
 
@@ -139,7 +137,7 @@ void CreateCubeFace(uint dir, uint3 p, float3 col)
 [numthreads(8,8,8)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    const uint index = id.x + (id.z * ChunkX) + (id.y * ChunkX * ChunkZ);
+    const uint index = id.x + (id.z * ChunkSize.x) + (id.y * ChunkSize.x * ChunkSize.z);
     
     const int voxelIso = ChunkDataBuffer[index];
 
@@ -147,22 +145,22 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     {
         const float3 col = 1.f;
 
-        if(id.x > (ChunkX-2) || ChunkDataBuffer[index + 1] <= 8)
+        if(id.x > (ChunkSize.x-2) || ChunkDataBuffer[index + 1] <= 8)
             CreateCubeFace(0, id, col);
         
         if(id.x < 1 || ChunkDataBuffer[index - 1] <= 8)
             CreateCubeFace(1, id, col);
 
-        if(id.y > (ChunkY-2) || ChunkDataBuffer[index + ChunkX * ChunkZ] <= 8)
+        if(id.y > (ChunkSize.y-2) || ChunkDataBuffer[index + ChunkSize.x * ChunkSize.z] <= 8)
             CreateCubeFace(2, id, col);
         
-        if(id.y < 1 || ChunkDataBuffer[index - ChunkX * ChunkZ] <= 8)
+        if(id.y < 1 || ChunkDataBuffer[index - ChunkSize.x * ChunkSize.z] <= 8)
             CreateCubeFace(3, id, col);
        
-        if(id.z > (ChunkZ-2) || ChunkDataBuffer[index + ChunkX] <= 8)
+        if(id.z > (ChunkSize.z-2) || ChunkDataBuffer[index + ChunkSize.x] <= 8)
             CreateCubeFace(4, id, col);
        
-        if(id.z < 1 || ChunkDataBuffer[index - ChunkX] <= 8)
+        if(id.z < 1 || ChunkDataBuffer[index - ChunkSize.x] <= 8)
             CreateCubeFace(5, id, col);
     }
 }
