@@ -8,13 +8,13 @@ float4x4 _LocalToWorld;
 
 struct Vertex
 {
-    float3 position;
+    // Packed position
+    int position;
 };
 
 struct Triangle
 {
     float3 normal;
-    float3 color;
     Vertex vertices[3];
 };
 
@@ -35,7 +35,7 @@ PackedVaryingsType CustomVert(Attributes input)
     const Triangle tri = MeshBuffer[input.vertexID / 3];
     const Vertex vert = tri.vertices[input.vertexID % 3];
     
-    am.positionOS = vert.position;
+    am.positionOS = float3(vert.position & 1023, (vert.position >> 10)  & 1023, (vert.position >> 20)  & 1023);
 #ifdef ATTRIBUTES_NEED_NORMAL
     am.normalOS = tri.normal;
 #endif
@@ -55,7 +55,8 @@ PackedVaryingsType CustomVert(Attributes input)
     am.uv3 = 0;
 #endif
 #ifdef ATTRIBUTES_NEED_COLOR
-    am.color.xyz = tri.color;
+    am.color.xyz = 1.f;
+    //am.color.xyz = tri.color;
 #endif
     UNITY_TRANSFER_INSTANCE_ID(input, am);
 

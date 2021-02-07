@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 1481.6191, g: 1835.6934, b: 2430.2617, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -123,71 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &335923710
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 335923712}
-  - component: {fileID: 335923711}
-  m_Layer: 0
-  m_Name: Custom Pass
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &335923711
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 335923710}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26d6499a6bd256e47b859377446493a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isGlobal: 0
-  fadeRadius: 10
-  priority: 0
-  customPasses:
-  - id: 0
-  injectionPoint: 0
-  references:
-    version: 1
-    00000000:
-      type: {class: FullScreenCustomPass, ns: UnityEngine.Rendering.HighDefinition, asm: Unity.RenderPipelines.HighDefinition.Runtime}
-      data:
-        m_Name: Bevel
-        enabled: 1
-        targetColorBuffer: 0
-        targetDepthBuffer: 0
-        clearFlags: 0
-        passFoldout: 0
-        m_Version: 0
-        fullscreenPassMaterial: {fileID: 2100000, guid: c09d27ce8bb25d8439f03a6b8de52257, type: 2}
-        materialPassIndex: 0
-        materialPassName: Custom Pass 0
-        fetchColorBuffer: 0
---- !u!4 &335923712
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 335923710}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 100, y: 100, z: 100}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &452925248
 GameObject:
   m_ObjectHideFlags: 0
@@ -353,8 +288,8 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.3
-  far clip plane: 1907.61
-  field of view: 36.5
+  far clip plane: 3124.4
+  field of view: 29.8
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -379,13 +314,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 452925248}
-  m_LocalRotation: {x: 0.27011627, y: 0.36596197, z: -0.11188581, w: 0.8835104}
-  m_LocalPosition: {x: 24.14, y: 46.01, z: 21.16}
+  m_LocalRotation: {x: 0.16122393, y: -0.37681147, z: 0.06678114, w: 0.90970343}
+  m_LocalPosition: {x: 1459, y: 438, z: -443}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 34, y: 45, z: 0}
+  m_LocalEulerAnglesHint: {x: 20.1, y: -45, z: 0}
 --- !u!1 &929190063
 GameObject:
   m_ObjectHideFlags: 0
@@ -473,13 +408,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 929190063}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: 0.19193341, y: 0.7702956, z: -0.28912795, w: 0.5349872}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 40.601, y: 110.057, z: -1.032}
 --- !u!114 &929190066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -898,8 +833,9 @@ MonoBehaviour:
   drawMeshMaterial: {fileID: 2100000, guid: eeb5f303aff7f9749b3147d951806a2a, type: 2}
   chunkMeshComputeShader: {fileID: 7200000, guid: b511ad36e8aa761469fe9aac3122ab09, type: 3}
   chunkDataComputeShader: {fileID: 7200000, guid: 5bb395146f7348d8a4313b58a3ceaee2, type: 3}
+  voxelVisibilityComputeShader: {fileID: 7200000, guid: 7e28f64b7415fe84095b45c402a8a693, type: 3}
   update: 0
-  chunkCount: {x: 2, y: 2, z: 2}
+  chunkCount: {x: 15, y: 15, z: 15}
 --- !u!4 &1700225642
 Transform:
   m_ObjectHideFlags: 0

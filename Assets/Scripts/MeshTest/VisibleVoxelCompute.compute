@@ -1,0 +1,45 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+RWStructuredBuffer<int> ChunkDataBuffer;
+RWStructuredBuffer<int> TriangleCount;
+RWStructuredBuffer<uint> ChunkSize;
+
+
+[numthreads(8,8,8)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // Precalculate how many triangles are visible.
+    // We do this because we don't know how many
+    // triangles we will need.
+    
+    const uint index = id.x + (id.z * ChunkSize[0]) + (id.y * ChunkSize[0] * ChunkSize[2]);
+    const int voxelIso = ChunkDataBuffer[index];
+    
+    if(voxelIso > 8)
+    {
+        // Determines how many faces are visible
+        const int visiblePosX = id.x > (ChunkSize[0]-2) || ChunkDataBuffer[index + 1] <= 8;
+        const int visibleNegX = id.x < 1               || ChunkDataBuffer[index - 1] <= 8;
+        const int visiblePosY = id.y > (ChunkSize[1]-2) || ChunkDataBuffer[index + ChunkSize[0] * ChunkSize[2]] <= 8;
+        const int visibleNegY = id.y < 1               || ChunkDataBuffer[index - ChunkSize[0] * ChunkSize[2]] <= 8;
+        const int visiblePosZ = id.z > (ChunkSize[2]-2) || ChunkDataBuffer[index + ChunkSize[0]] <= 8;
+        const int visibleNegZ = id.z < 1               || ChunkDataBuffer[index - ChunkSize[0]] <= 8;
+
+        const int visible = visiblePosX + visibleNegX + visiblePosY + visibleNegY + visiblePosZ + visibleNegZ;
+
+        // Add faces * 2 to triangle count (2 triangles per face)
+        InterlockedAdd(TriangleCount[0], 12);
+
+        const int visibilityFlag =
+            visiblePosX
+            | visibleNegX << 1
+            | visiblePosY << 2
+            | visibleNegY << 3
+            | visiblePosZ << 4
+            | visibleNegZ << 5;
+
+        // OR visibility flag so our mesh generator can read it without any calculations
+        ChunkDataBuffer[index] |= visibilityFlag << 4;
+    }
+}
