@@ -61,7 +61,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     // float caves = (caveNoiseValue * caveNoiseScale);
     
     const uint index = id.x + (id.y * CHUNK_SIZE) + (id.z * CHUNK_SIZE * CHUNK_SIZE);
-    ChunkDataBuffer[index] = hills * 128;
+    ChunkDataBuffer[index] = hills * 1;
 }
 
 //TEMP
