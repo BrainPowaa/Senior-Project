@@ -9,6 +9,7 @@ public class Spawner : MonoBehaviour
     // An instance of the ScriptableObject defined above.
     public SpawnManagerScriptableObject spawnManagerValues;
 
+
     // This will be appended to the name of the created entities and increment when each is created.
     int instanceNumber = 1;
 
@@ -18,6 +19,9 @@ public class Spawner : MonoBehaviour
     }
 
     void SpawnEntities()
+
+
+
     {
         int currentSpawnPointIndex = 0;
 
