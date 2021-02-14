@@ -13,6 +13,7 @@ public class Spawner : MonoBehaviour
     // This will be appended to the name of the created entities and increment when each is created.
     int instanceNumber = 1;
 
+
     void Start()
     {
         SpawnEntities();

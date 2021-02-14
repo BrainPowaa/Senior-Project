@@ -7,6 +7,7 @@ public class SpawnManagerScriptableObject : ScriptableObject
 {
     //This is the how we manage the ScriptableObjects that we create in unity. 
 
+
     public string prefabName;
 
     public int numberOfPrefabsToCreate;
