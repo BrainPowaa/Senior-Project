@@ -2,6 +2,7 @@
 
 public class Spawner : MonoBehaviour
 {
+    //This is used to Spawn Intities for our world and we can create the number of instances and also we can destroy them as well. 
     // The GameObject to instantiate.
     public GameObject entityToSpawn;
 
