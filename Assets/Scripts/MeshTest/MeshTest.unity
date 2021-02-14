@@ -817,7 +817,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1700225641
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -834,8 +834,10 @@ MonoBehaviour:
   chunkMeshComputeShader: {fileID: 7200000, guid: b511ad36e8aa761469fe9aac3122ab09, type: 3}
   chunkDataComputeShader: {fileID: 7200000, guid: 5bb395146f7348d8a4313b58a3ceaee2, type: 3}
   voxelVisibilityComputeShader: {fileID: 7200000, guid: 7e28f64b7415fe84095b45c402a8a693, type: 3}
+  lod: 0
+  chunkSize: 64
   update: 0
-  chunkCount: {x: 15, y: 15, z: 15}
+  chunkCount: {x: 4, y: 32, z: 4}
 --- !u!4 &1700225642
 Transform:
   m_ObjectHideFlags: 0

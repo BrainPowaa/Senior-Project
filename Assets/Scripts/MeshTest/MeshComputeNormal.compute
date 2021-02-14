@@ -14,16 +14,11 @@ struct DrawArg
     uint startInstanceLocation;
 };
 
-struct Vertex
-{
-    // Packed number
-    int position;
-};
-
 struct Triangle
 {
     float3 normal;
-    Vertex vertices[3];
+    // Packed verts
+    int vertices[3];
 };
 
 //////// Buffers ////////
@@ -32,6 +27,7 @@ RWStructuredBuffer<int> ChunkDataBuffer;
 AppendStructuredBuffer<Triangle> MeshBuffer;
 RWStructuredBuffer<DrawArg> DrawArgsBuffer;
 RWStructuredBuffer<uint> ChunkSize;
+RWStructuredBuffer<uint> ChunkLOD;
 
 //////// Lookup Tables ////////
 
@@ -105,33 +101,33 @@ static const uint3 CubeFaceDirLookup[36] =
 //////// Triangle Helpers ////////
 
 // Creates a face from 2 triangles and a direction.
-void CreateCubeFace(uint dir, uint3 p, float3 col)
+void CreateCubeFace(uint dir, uint3 p, float3 col, uint lod)
 {
     const float3 normal = NormalDirLookup[dir];
     const uint dirLookup = dir * 6;
     
     Triangle tri_a;
     
-    const uint3 v1_a = CubeFaceDirLookup[dirLookup]     + p;
-    const uint3 v2_a = CubeFaceDirLookup[dirLookup + 1] + p;
-    const uint3 v3_a = CubeFaceDirLookup[dirLookup + 2] + p;
+    const uint3 v1_a = (CubeFaceDirLookup[dirLookup]     + p) * lod;
+    const uint3 v2_a = (CubeFaceDirLookup[dirLookup + 1] + p) * lod;
+    const uint3 v3_a = (CubeFaceDirLookup[dirLookup + 2] + p) * lod;
 
-    tri_a.vertices[0].position = (v1_a.x & 1023) | (v1_a.y & 1023) << 10 | (v1_a.z & 1023) << 20;
-    tri_a.vertices[1].position = (v2_a.x & 1023) | (v2_a.y & 1023) << 10 | (v2_a.z & 1023) << 20;
-    tri_a.vertices[2].position = (v3_a.x & 1023) | (v3_a.y & 1023) << 10 | (v3_a.z & 1023) << 20;
+    tri_a.vertices[0] = (v1_a.x & 1023) | (v1_a.y & 1023) << 10 | (v1_a.z & 1023) << 20;
+    tri_a.vertices[1] = (v2_a.x & 1023) | (v2_a.y & 1023) << 10 | (v2_a.z & 1023) << 20;
+    tri_a.vertices[2] = (v3_a.x & 1023) | (v3_a.y & 1023) << 10 | (v3_a.z & 1023) << 20;
     
     tri_a.normal = normal;
     //tri_a.color = col;
 
     Triangle tri_b;
 
-    const uint3 v1_b = CubeFaceDirLookup[dirLookup + 3] + p;
-    const uint3 v2_b = CubeFaceDirLookup[dirLookup + 4] + p;
-    const uint3 v3_b = CubeFaceDirLookup[dirLookup + 5] + p;
+    const uint3 v1_b = (CubeFaceDirLookup[dirLookup + 3] + p)  * lod;
+    const uint3 v2_b = (CubeFaceDirLookup[dirLookup + 4] + p)  * lod;
+    const uint3 v3_b = (CubeFaceDirLookup[dirLookup + 5] + p)  * lod;
 
-    tri_b.vertices[0].position = (v1_b.x & 1023) | (v1_b.y & 1023) << 10 | (v1_b.z & 1023) << 20;
-    tri_b.vertices[1].position = (v2_b.x & 1023) | (v2_b.y & 1023) << 10 | (v2_b.z & 1023) << 20;
-    tri_b.vertices[2].position = (v3_b.x & 1023) | (v3_b.y & 1023) << 10 | (v3_b.z & 1023) << 20;
+    tri_b.vertices[0] = (v1_b.x & 1023) | (v1_b.y & 1023) << 10 | (v1_b.z & 1023) << 20;
+    tri_b.vertices[1] = (v2_b.x & 1023) | (v2_b.y & 1023) << 10 | (v2_b.z & 1023) << 20;
+    tri_b.vertices[2] = (v3_b.x & 1023) | (v3_b.y & 1023) << 10 | (v3_b.z & 1023) << 20;
 
     tri_b.normal = normal;
     //tri_b.color = col;
@@ -144,7 +140,13 @@ void CreateCubeFace(uint dir, uint3 p, float3 col)
 [numthreads(8,8,8)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    const uint index = id.x + (id.z * ChunkSize[0]) + (id.y * ChunkSize[0] * ChunkSize[2]);
+    const uint lod = 1 << ChunkLOD[0];
+    
+    const uint x = id.x * lod;
+    const uint y = id.y * lod * ChunkSize[0] * ChunkSize[2];
+    const uint z = id.z * lod * ChunkSize[0];
+    
+    const uint index = x + y + z;
     
     const int voxelIso = ChunkDataBuffer[index] & 0x0F;
 
@@ -162,22 +164,22 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         const float3 col = 1.f;
 
         if(visXP)
-            CreateCubeFace(0, id, col);
+            CreateCubeFace(0, id, col, lod);
         
         if(visXN)
-            CreateCubeFace(1, id, col);
+            CreateCubeFace(1, id, col, lod);
 
         if(visYP)
-            CreateCubeFace(2, id, col);
+            CreateCubeFace(2, id, col, lod);
         
         if(visYN)
-            CreateCubeFace(3, id, col);
+            CreateCubeFace(3, id, col, lod);
        
         if(visZP)
-            CreateCubeFace(4, id, col);
+            CreateCubeFace(4, id, col, lod);
         
         if(visZN)
-            CreateCubeFace(5, id, col);
+            CreateCubeFace(5, id, col, lod);
     }
 }
 

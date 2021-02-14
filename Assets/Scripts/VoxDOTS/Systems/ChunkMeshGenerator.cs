@@ -47,22 +47,22 @@ namespace VoxDOTS.Systems
 
                         var p = GetPositionFromIndex(i) + chunk.Position;
                             
-                        if(p.z < Constants.ChunkSize - 1)
+                        //if(p.z > (Constants.ChunkSize-2) || chunkData[i + Constants.ChunkSize * Constants.ChunkSize].Value < 8)
                             GenerateFace(ref vertices, ref indices, new int3(0, 0, -1), p);
                         
-                        if(p.z > 0)
+                        //if(p.z < 1 || chunkData[i - Constants.ChunkSize * Constants.ChunkSize].Value < 8)
                             GenerateFace(ref vertices, ref indices, new int3(0, 0, 1), p);
 
-                        if(p.y < Constants.ChunkSize - 1)
+                        //if(p.y > (Constants.ChunkSize-2) || chunkData[i + Constants.ChunkSize].Value < 8)
                             GenerateFace(ref vertices, ref indices, new int3(0, 1, 0), p);
 
-                        if(p.y > 0)
+                        //if(p.y < 1 || chunkData[i - Constants.ChunkSize].Value < 8)
                             GenerateFace(ref vertices, ref indices, new int3(0, -1, 0), p);
 
-                        if(p.x < Constants.ChunkSize - 1)
+                        //if(p.x > (Constants.ChunkSize-2) || chunkData[i + 1].Value < 8)
                             GenerateFace(ref vertices, ref indices, new int3(1, 0, 0), p);
 
-                        if (p.x > 0)
+                        //if (p.x < 1 || chunkData[i - 1].Value < 8)
                             GenerateFace(ref vertices, ref indices, new int3(-1, 0, 0), p);
                     }
                 }).Schedule();

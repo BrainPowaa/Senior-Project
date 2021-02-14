@@ -20,12 +20,21 @@ public class ComputeMeshTest : MonoBehaviour
     public ComputeShader chunkMeshComputeShader;
     public ComputeShader chunkDataComputeShader;
     public ComputeShader voxelVisibilityComputeShader;
+    public int lod = 0;
+    public int chunkSize = 64;
 
     public bool update = true;
 
     public Vector3Int chunkCount = new Vector3Int(1, 1, 1);
 
-    private ComputeBuffer _chunkDataBuffer, triangleCountBuffer, _meshBuffer, _drawArgsBuffer, _tempOffsetBuffer, _chunkSizeBuffer;
+    private ComputeBuffer
+        _chunkDataBuffer,
+        _triangleCountBuffer,
+        _meshBuffer,
+        _drawArgsBuffer,
+        _tempOffsetBuffer,
+        _chunkSizeBuffer,
+        _chunkLODBuffer;
 
     private int[] triangleCount = new []{0};
 
@@ -46,22 +55,23 @@ public class ComputeMeshTest : MonoBehaviour
         _chunkSizeBuffer = new ComputeBuffer(3, sizeof(uint));
         _chunkSizeBuffer.SetData(new[]
         {
-            (uint)(Constants.ChunkSize * chunkCount.x),
-            (uint)(Constants.ChunkSize * chunkCount.y),
-            (uint)(Constants.ChunkSize * chunkCount.z),
+            (uint)(chunkSize * chunkCount.x),
+            (uint)(chunkSize * chunkCount.y),
+            (uint)(chunkSize * chunkCount.z),
         });
 
         // Voxel data buffer on the GPU.
         _chunkDataBuffer = new ComputeBuffer((int)maxVoxelCount, sizeof(int));
 
-        triangleCountBuffer = new ComputeBuffer(1, sizeof(int));
-        triangleCountBuffer.SetData(triangleCount);
+        _triangleCountBuffer = new ComputeBuffer(1, sizeof(int));
+        _triangleCountBuffer.SetData(triangleCount);
 
         // Create buffer that has draw args that will be assigned on the GPU.
         _drawArgsBuffer = new ComputeBuffer(1, sizeof(int) * 4, ComputeBufferType.IndirectArguments);
         _drawArgsBuffer.SetData(new[] {new DrawArg {vertexCountPerInstance = 0, instanceCount = 1}});
 
         _tempOffsetBuffer = new ComputeBuffer(1, sizeof(float));
+        _chunkLODBuffer = new ComputeBuffer(1, sizeof(uint));
 
         UpdateBuffers();
     }
@@ -69,40 +79,44 @@ public class ComputeMeshTest : MonoBehaviour
     private void OnDisable()
     {
         _chunkDataBuffer.Release();
-        triangleCountBuffer.Release();
+        _triangleCountBuffer.Release();
         _drawArgsBuffer.Release();
         _meshBuffer?.Release();
         _tempOffsetBuffer.Release();
         _chunkSizeBuffer.Release();
+        _chunkLODBuffer.Release();
     }
 
     void UpdateBuffers()
     {
-        var threadsX = (Constants.ChunkSize / 8) * chunkCount.x;
-        var threadsY = (Constants.ChunkSize / 8) * chunkCount.y;
-        var threadsZ = (Constants.ChunkSize / 8) * chunkCount.z;
+        var threadsX = (chunkSize / 8) * chunkCount.x / (1 << lod);
+        var threadsY = (chunkSize / 8) * chunkCount.y / (1 << lod);
+        var threadsZ = (chunkSize / 8) * chunkCount.z / (1 << lod);
         
         // Assign buffers.
         chunkDataComputeShader.SetBuffer(0, "ChunkDataBuffer", _chunkDataBuffer);
         chunkDataComputeShader.SetBuffer(0, "Offset", _tempOffsetBuffer);
-        chunkDataComputeShader.SetBuffer(1, "Offset", _tempOffsetBuffer);
         chunkDataComputeShader.SetBuffer(0, "ChunkSize", _chunkSizeBuffer);
+        chunkDataComputeShader.SetBuffer(0, "ChunkLOD", _chunkLODBuffer);
+        chunkDataComputeShader.SetBuffer(1, "Offset", _tempOffsetBuffer);
         
         // Run voxel data generator.
         chunkDataComputeShader.Dispatch(0, threadsX, threadsY, threadsZ);
         chunkDataComputeShader.Dispatch(1, 1, 1, 1);
         
         // Count up visible triangle faces
-        triangleCountBuffer.SetData(new[] {0});
+        _triangleCountBuffer.SetData(new[] {0});
+        _chunkLODBuffer.SetData(new[] {(uint)(lod)});
 
         voxelVisibilityComputeShader.SetBuffer(0, "ChunkDataBuffer", _chunkDataBuffer);
-        voxelVisibilityComputeShader.SetBuffer(0, "TriangleCount", triangleCountBuffer);
+        voxelVisibilityComputeShader.SetBuffer(0, "TriangleCount", _triangleCountBuffer);
         voxelVisibilityComputeShader.SetBuffer(0, "ChunkSize", _chunkSizeBuffer);
+        voxelVisibilityComputeShader.SetBuffer(0, "ChunkLOD", _chunkLODBuffer);
 
         // Run counter
         voxelVisibilityComputeShader.Dispatch(0, threadsX, threadsY, threadsZ);
         
-        triangleCountBuffer.GetData(triangleCount);
+        _triangleCountBuffer.GetData(triangleCount);
         
         _meshBuffer?.Release();
 
@@ -118,6 +132,7 @@ public class ComputeMeshTest : MonoBehaviour
         chunkMeshComputeShader.SetBuffer(1, "DrawArgsBuffer", _drawArgsBuffer);
         chunkMeshComputeShader.SetBuffer(0, "ChunkDataBuffer", _chunkDataBuffer);
         chunkMeshComputeShader.SetBuffer(0, "ChunkSize", _chunkSizeBuffer);
+        chunkMeshComputeShader.SetBuffer(0, "ChunkLOD", _chunkLODBuffer);
 
         // Run voxel mesh generator.
         chunkMeshComputeShader.Dispatch(0, threadsX, threadsY, threadsZ);

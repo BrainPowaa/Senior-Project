@@ -6,16 +6,11 @@ float _NoiseFrequency;
 float3 _NoiseOffset;
 float4x4 _LocalToWorld;
 
-struct Vertex
-{
-    // Packed position
-    int position;
-};
-
 struct Triangle
 {
     float3 normal;
-    Vertex vertices[3];
+    // Packed verts
+    int vertices[3];
 };
 
 // Vertex input attributes
@@ -33,9 +28,9 @@ PackedVaryingsType CustomVert(Attributes input)
     AttributesMesh am;
 
     const Triangle tri = MeshBuffer[input.vertexID / 3];
-    const Vertex vert = tri.vertices[input.vertexID % 3];
+    const int vert = tri.vertices[input.vertexID % 3];
     
-    am.positionOS = float3(vert.position & 1023, (vert.position >> 10)  & 1023, (vert.position >> 20)  & 1023);
+    am.positionOS = float3(vert & 1023, (vert >> 10)  & 1023, (vert >> 20)  & 1023);
 #ifdef ATTRIBUTES_NEED_NORMAL
     am.normalOS = tri.normal;
 #endif

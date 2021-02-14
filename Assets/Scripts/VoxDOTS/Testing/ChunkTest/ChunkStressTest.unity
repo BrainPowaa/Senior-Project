@@ -372,7 +372,7 @@ MonoBehaviour:
     x: 1
     y: 1
     z: 1
-  buildChunks: 0
+  buildChunks: 1
   maxChunksPerTick: 10000
 --- !u!4 &364625775
 Transform:

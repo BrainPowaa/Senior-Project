@@ -4,7 +4,7 @@
 RWStructuredBuffer<int> ChunkDataBuffer;
 RWStructuredBuffer<int> TriangleCount;
 RWStructuredBuffer<uint> ChunkSize;
-
+RWStructuredBuffer<uint> ChunkLOD;
 
 [numthreads(8,8,8)]
 void CSMain (uint3 id : SV_DispatchThreadID)
@@ -12,19 +12,33 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     // Precalculate how many triangles are visible.
     // We do this because we don't know how many
     // triangles we will need.
+
+    const uint lod = 1 << ChunkLOD[0];
     
-    const uint index = id.x + (id.z * ChunkSize[0]) + (id.y * ChunkSize[0] * ChunkSize[2]);
+    const uint x = id.x * lod;
+    const uint y = id.y * lod * ChunkSize[0] * ChunkSize[2];
+    const uint z = id.z * lod * ChunkSize[0];
+    
+    const uint index = x + y + z;
+    
     const int voxelIso = ChunkDataBuffer[index];
     
     if(voxelIso > 8)
     {
         // Determines how many faces are visible
-        const int visiblePosX = id.x > (ChunkSize[0]-2) || ChunkDataBuffer[index + 1] <= 8;
-        const int visibleNegX = id.x < 1               || ChunkDataBuffer[index - 1] <= 8;
-        const int visiblePosY = id.y > (ChunkSize[1]-2) || ChunkDataBuffer[index + ChunkSize[0] * ChunkSize[2]] <= 8;
-        const int visibleNegY = id.y < 1               || ChunkDataBuffer[index - ChunkSize[0] * ChunkSize[2]] <= 8;
-        const int visiblePosZ = id.z > (ChunkSize[2]-2) || ChunkDataBuffer[index + ChunkSize[0]] <= 8;
-        const int visibleNegZ = id.z < 1               || ChunkDataBuffer[index - ChunkSize[0]] <= 8;
+        const int visiblePosX = id.x > (ChunkSize[0]-2) || ChunkDataBuffer[index + lod] <= 8;
+        const int visibleNegX = id.x < 1                || ChunkDataBuffer[index - lod] <= 8;
+        const int visiblePosY = id.y > (ChunkSize[1]-2) || ChunkDataBuffer[index + ChunkSize[0] * ChunkSize[2] * lod] <= 8;
+        const int visibleNegY = id.y < 1                || ChunkDataBuffer[index - ChunkSize[0] * ChunkSize[2] * lod] <= 8;
+        const int visiblePosZ = id.z > (ChunkSize[2]-2) || ChunkDataBuffer[index + ChunkSize[0] * lod] <= 8;
+        const int visibleNegZ = id.z < 1                || ChunkDataBuffer[index - ChunkSize[0] * lod] <= 8;
+
+        // const int visiblePosX = 1;
+        // const int visibleNegX = 1;
+        // const int visiblePosY = 1;
+        // const int visibleNegY = 1;
+        // const int visiblePosZ = 1;
+        // const int visibleNegZ = 1;
 
         const int visible = visiblePosX + visibleNegX + visiblePosY + visibleNegY + visiblePosZ + visibleNegZ;
 

@@ -44,26 +44,32 @@ static const uint3 CENTER = uint3(48, 48, 48);
 RWStructuredBuffer<int> ChunkDataBuffer;
 RWStructuredBuffer<int> Offset;
 RWStructuredBuffer<uint> ChunkSize;
+RWStructuredBuffer<uint> ChunkLOD;
 
 // Main
 [numthreads(8,8,8)]
 void UpdateVoxelData(uint3 id : SV_DispatchThreadID)
 {
+    const uint lod = 1 << ChunkLOD[0];
+    
+    const uint x = id.x * lod;
+    const uint y = id.y * lod;
+    const uint z = id.z * lod;
+    
     const float s = .2f;
-    float noise = fnlGetNoise3D(CELLSTATE, id.x*s + Offset[0]/50.f, id.y*s, id.z*s);
-    noise += fnlGetNoise3D(CELLSTATE, id.x*s*2 + Offset[0]/50.f, id.y*s*2, id.z*s*2)/10.f;
-    noise += fnlGetNoise3D(CELLSTATE, id.x*s*4 + Offset[0]/50.f, id.y*s*4, id.z*s*4)/20.f;
-    noise += fnlGetNoise3D(STATE, (id.x*s*2.f) + Offset[0]/50.f, id.y*s*2.f, id.z*s*2.f) / 5.f;
-    noise += fnlGetNoise3D(STATE, (id.x*s*4.f) + Offset[0]/50.f, id.y*s*4.f, id.z*s*4.f) / 10.f;
-    noise += fnlGetNoise3D(STATE, (id.x*s*8.f)+ Offset[0]/50.f, id.y*s*8.f, id.z*s*8.f) / 15.f;
+    float noise = fnlGetNoise3D(CELLSTATE, x*s + Offset[0]/50.f, y*s, z*s);
+    noise += fnlGetNoise3D(CELLSTATE, x*s*2 + Offset[0]/50.f, y*s*2, z*s*2)/10.f;
+    noise += fnlGetNoise3D(CELLSTATE, x*s*4 + Offset[0]/50.f, y*s*4, z*s*4)/20.f;
+    noise += fnlGetNoise3D(STATE, (x*s*2.f) + Offset[0]/50.f, y*s*2.f, z*s*2.f) / 5.f;
+    noise += fnlGetNoise3D(STATE, (x*s*4.f) + Offset[0]/50.f, y*s*4.f, z*s*4.f) / 10.f;
+    noise += fnlGetNoise3D(STATE, (x*s*8.f)+ Offset[0]/50.f, y*s*8.f, z*s*8.f) / 15.f;
 
     noise *= 32.f;
 
-    noise += (48 - (id.y*1.f));
-    noise = max(noise, 10.f - id.y);
+    noise += (45 - (y*1.f));
+    noise = max(noise, 10.f - y);
     
-    const uint index = id.x + (id.z * ChunkSize[0]) + (id.y * ChunkSize[0] * ChunkSize[2]);
-
+    const uint index = x + y * ChunkSize[0] * ChunkSize[2] + z * ChunkSize[0];
     ChunkDataBuffer[index] = clamp(noise, 0, 15);
 }
 

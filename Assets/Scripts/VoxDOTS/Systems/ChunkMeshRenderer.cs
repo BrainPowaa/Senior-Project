@@ -46,8 +46,15 @@ namespace VoxDOTS.Systems
                 .WithNone<ChunkMeshObjectTag>()
                 .ForEach((Entity entity) =>
                 {
-                    _entityToMeshObject.Add(entity.Index, new UnityEngine.Mesh());
+                    Debug.Log("Added mesh");
+
+                    Mesh mesh = new UnityEngine.Mesh();
+
+                    mesh.MarkDynamic();
+                    
+                    _entityToMeshObject.Add(entity.Index, mesh);
                     ecb.AddComponent<ChunkMeshObjectTag>(entity);
+                    ecb.AddComponent<ChunkMeshNeedsRenderTag>(entity);
                 }).Run();
             
             // TEMP: Clean-up chunks and remove from dictionary
@@ -59,6 +66,8 @@ namespace VoxDOTS.Systems
                 .WithAll<ChunkMeshObjectTag>()
                 .ForEach((Entity entity) =>
                 {
+                    Debug.Log("Remove mesh");
+
                     Object.Destroy(_entityToMeshObject[entity.Index]);
 
                     _entityToMeshObject.Remove(entity.Index);
@@ -83,14 +92,17 @@ namespace VoxDOTS.Systems
 
                     mesh.SetVertexBufferParams(
                         vertices.Length,
-                        new VertexAttributeDescriptor
-                            (VertexAttribute.Position, VertexAttributeFormat.Float32, 3)
+                        new VertexAttributeDescriptor(VertexAttribute.Position, VertexAttributeFormat.Float32, 3)
                     );
                     
-                    mesh.SetVertexBufferData(vertices, 0, 0, vertices.Length);
+                    mesh.SetVertexBufferData(vertices, 0, 0, vertices.Length, 0,
+                        MeshUpdateFlags.DontRecalculateBounds
+                        | MeshUpdateFlags.DontValidateIndices);
                     
                     mesh.SetIndexBufferParams(indices.Length, IndexFormat.UInt32);
-                    mesh.SetIndexBufferData(indices, 0, 0, indices.Length);
+                    mesh.SetIndexBufferData(indices, 0, 0, indices.Length,
+                        MeshUpdateFlags.DontRecalculateBounds
+                        | MeshUpdateFlags.DontValidateIndices);
                     
                     mesh.SetSubMesh(0, new SubMeshDescriptor(0, vertices.Length));
                     
@@ -102,9 +114,14 @@ namespace VoxDOTS.Systems
                 .WithAll<ChunkMeshObjectTag, ChunkMeshIndicesData, ChunkMeshVerticesData>()
                 .ForEach((Entity entity) =>
                 {
-                    Debug.Log("draw");
-                    Graphics.DrawMesh(_entityToMeshObject[entity.Index], Vector3.zero, Quaternion.identity, null,
-                        0);
+                    Graphics.DrawMesh
+                    (
+                        _entityToMeshObject[entity.Index],
+                        Vector3.zero,
+                        Quaternion.identity,
+                        _material,
+                        0, null, 0, null, true, true, true
+                    );
                 }).Run();
             
             //ecb.AddComponent<ChunkMeshObjectTag>(_addMeshObjectTagQuery);
