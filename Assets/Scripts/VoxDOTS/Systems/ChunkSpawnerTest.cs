@@ -41,6 +41,7 @@ namespace VoxDOTS.Systems
         {
             if (buildChunks)
             {
+                Debug.Log("Go");
                 buildChunks = false;
 
                 CreateChunks();
@@ -48,6 +49,7 @@ namespace VoxDOTS.Systems
                 _isUpdating = true;
 
                 _currentPosition = 0;
+                return;
             }
 
             if (_isUpdating)

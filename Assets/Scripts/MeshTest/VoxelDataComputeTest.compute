@@ -25,23 +25,52 @@ fnl_state TestCreateState(int seed)
     return newState;
 }
 
+fnl_state TestCellularState(int seed)
+{
+    fnl_state newState = TestCreateState(seed);
+    newState.noise_type = FNL_NOISE_CELLULAR;
+    return newState;
+}
+
 //////// Constants ////////
 
 static fnl_state STATE = TestCreateState(1337);
+static fnl_state CELLSTATE = TestCellularState(1337);
 
-static const uint CHUNK_SIZE = 32;
+static const uint3 CENTER = uint3(48, 48, 48);
 
 //////// Buffers ////////
 
 RWStructuredBuffer<int> ChunkDataBuffer;
 RWStructuredBuffer<int> Offset;
+RWStructuredBuffer<uint> ChunkSize;
+RWStructuredBuffer<uint> ChunkLOD;
 
 // Main
 [numthreads(8,8,8)]
 void UpdateVoxelData(uint3 id : SV_DispatchThreadID)
 {
-    const uint index = id.x + (id.y * CHUNK_SIZE) + (id.z * CHUNK_SIZE * CHUNK_SIZE);
-    ChunkDataBuffer[index] = fnlGetNoise3D(STATE, id.x + Offset[0]/10.f, id.y, id.z) * 32.f;
+    const uint lod = 1 << ChunkLOD[0];
+    
+    const uint x = id.x * lod;
+    const uint y = id.y * lod;
+    const uint z = id.z * lod;
+    
+    const float s = .2f;
+    float noise = fnlGetNoise3D(CELLSTATE, x*s + Offset[0]/50.f, y*s, z*s);
+    noise += fnlGetNoise3D(CELLSTATE, x*s*2 + Offset[0]/50.f, y*s*2, z*s*2)/10.f;
+    noise += fnlGetNoise3D(CELLSTATE, x*s*4 + Offset[0]/50.f, y*s*4, z*s*4)/20.f;
+    noise += fnlGetNoise3D(STATE, (x*s*2.f) + Offset[0]/50.f, y*s*2.f, z*s*2.f) / 5.f;
+    noise += fnlGetNoise3D(STATE, (x*s*4.f) + Offset[0]/50.f, y*s*4.f, z*s*4.f) / 10.f;
+    noise += fnlGetNoise3D(STATE, (x*s*8.f)+ Offset[0]/50.f, y*s*8.f, z*s*8.f) / 15.f;
+
+    noise *= 32.f;
+
+    noise += (45 - (y*1.f));
+    noise = max(noise, 10.f - y);
+    
+    const uint index = x + y * ChunkSize[0] * ChunkSize[2] + z * ChunkSize[0];
+    ChunkDataBuffer[index] = clamp(noise, 0, 15);
 }
 
 //TEMP

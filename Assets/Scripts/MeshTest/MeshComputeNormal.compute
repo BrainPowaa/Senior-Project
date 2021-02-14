@@ -4,8 +4,6 @@
 
 //////// Constants ////////
 
-static const uint CHUNK_SIZE = 32;
-
 //////// Struct Data Containers ////////
 
 struct DrawArg
@@ -16,16 +14,11 @@ struct DrawArg
     uint startInstanceLocation;
 };
 
-struct Vertex
-{
-    float3 position;
-    float3 normal;
-    float3 color;
-};
-
 struct Triangle
 {
-    Vertex vertices[3];
+    float3 normal;
+    // Packed verts
+    int vertices[3];
 };
 
 //////// Buffers ////////
@@ -33,10 +26,12 @@ struct Triangle
 RWStructuredBuffer<int> ChunkDataBuffer;
 AppendStructuredBuffer<Triangle> MeshBuffer;
 RWStructuredBuffer<DrawArg> DrawArgsBuffer;
+RWStructuredBuffer<uint> ChunkSize;
+RWStructuredBuffer<uint> ChunkLOD;
 
 //////// Lookup Tables ////////
 
-static float3 NormalDirLookup[6] =
+static const float3 NormalDirLookup[6] =
 {
     float3( 1.0f,  0.0f,  0.0f),
     float3(-1.0f,  0.0f,  0.0f),
@@ -46,98 +41,96 @@ static float3 NormalDirLookup[6] =
     float3( 0.0f,  0.0f, -1.0f)
 };
 
-static float3 CubeFaceDirLookup[36] =
+static const uint3 CubeFaceDirLookup[36] =
 {
     // X+
-    float3(1.0f, 0.0f, 0.0f),
-    float3(1.0f, 1.0f, 0.0f),
-    float3(1.0f, 0.0f, 1.0f),
+    uint3(1.0f, 0.0f, 0.0f),
+    uint3(1.0f, 1.0f, 0.0f),
+    uint3(1.0f, 0.0f, 1.0f),
 
-    float3(1.0f, 1.0f, 1.0f),
-    float3(1.0f, 0.0f, 1.0f),
-    float3(1.0f, 1.0f, 0.0f),
+    uint3(1.0f, 1.0f, 1.0f),
+    uint3(1.0f, 0.0f, 1.0f),
+    uint3(1.0f, 1.0f, 0.0f),
     
     // X-
-    float3(0.0f, 0.0f, 0.0f),
-    float3(0.0f, 0.0f, 1.0f),
-    float3(0.0f, 1.0f, 0.0f),
+    uint3(0.0f, 0.0f, 0.0f),
+    uint3(0.0f, 0.0f, 1.0f),
+    uint3(0.0f, 1.0f, 0.0f),
 
-    float3(0.0f, 1.0f, 1.0f),
-    float3(0.0f, 1.0f, 0.0f),
-    float3(0.0f, 0.0f, 1.0f),
+    uint3(0.0f, 1.0f, 1.0f),
+    uint3(0.0f, 1.0f, 0.0f),
+    uint3(0.0f, 0.0f, 1.0f),
     
     // Y+
-    float3(0.0f, 1.0f, 0.0f),
-    float3(0.0f, 1.0f, 1.0f),
-    float3(1.0f, 1.0f, 0.0f),
+    uint3(0.0f, 1.0f, 0.0f),
+    uint3(0.0f, 1.0f, 1.0f),
+    uint3(1.0f, 1.0f, 0.0f),
 
-    float3(1.0f, 1.0f, 1.0f),
-    float3(1.0f, 1.0f, 0.0f),
-    float3(0.0f, 1.0f, 1.0f),
+    uint3(1.0f, 1.0f, 1.0f),
+    uint3(1.0f, 1.0f, 0.0f),
+    uint3(0.0f, 1.0f, 1.0f),
     
     // Y-
-    float3(0.0f, 0.0f, 0.0f),
-    float3(1.0f, 0.0f, 0.0f),
-    float3(0.0f, 0.0f, 1.0f),
+    uint3(0.0f, 0.0f, 0.0f),
+    uint3(1.0f, 0.0f, 0.0f),
+    uint3(0.0f, 0.0f, 1.0f),
 
-    float3(1.0f, 0.0f, 1.0f),
-    float3(0.0f, 0.0f, 1.0f),
-    float3(1.0f, 0.0f, 0.0f),
+    uint3(1.0f, 0.0f, 1.0f),
+    uint3(0.0f, 0.0f, 1.0f),
+    uint3(1.0f, 0.0f, 0.0f),
     
     // Z+
-    float3(0.0f, 0.0f, 1.0f),
-    float3(1.0f, 0.0f, 1.0f),
-    float3(0.0f, 1.0f, 1.0f),
+    uint3(0.0f, 0.0f, 1.0f),
+    uint3(1.0f, 0.0f, 1.0f),
+    uint3(0.0f, 1.0f, 1.0f),
 
-    float3(1.0f, 1.0f, 1.0f),
-    float3(0.0f, 1.0f, 1.0f),
-    float3(1.0f, 0.0f, 1.0f),
+    uint3(1.0f, 1.0f, 1.0f),
+    uint3(0.0f, 1.0f, 1.0f),
+    uint3(1.0f, 0.0f, 1.0f),
     
     // Z-
-    float3(0.0f, 0.0f, 0.0f),
-    float3(0.0f, 1.0f, 0.0f),
-    float3(1.0f, 0.0f, 0.0f),
+    uint3(0.0f, 0.0f, 0.0f),
+    uint3(0.0f, 1.0f, 0.0f),
+    uint3(1.0f, 0.0f, 0.0f),
 
-    float3(1.0f, 1.0f, 0.0f),
-    float3(1.0f, 0.0f, 0.0f),
-    float3(0.0f, 1.0f, 0.0f),
+    uint3(1.0f, 1.0f, 0.0f),
+    uint3(1.0f, 0.0f, 0.0f),
+    uint3(0.0f, 1.0f, 0.0f),
 };
 
 //////// Triangle Helpers ////////
 
 // Creates a face from 2 triangles and a direction.
-void CreateCubeFace(uint dir, uint3 p, float3 col)
+void CreateCubeFace(uint dir, uint3 p, float3 col, uint lod)
 {
     const float3 normal = NormalDirLookup[dir];
     const uint dirLookup = dir * 6;
     
     Triangle tri_a;
     
-    tri_a.vertices[0].position = CubeFaceDirLookup[dirLookup]     + p,
-    tri_a.vertices[1].position = CubeFaceDirLookup[dirLookup + 1] + p,
-    tri_a.vertices[2].position = CubeFaceDirLookup[dirLookup + 2] + p,
+    const uint3 v1_a = (CubeFaceDirLookup[dirLookup]     + p) * lod;
+    const uint3 v2_a = (CubeFaceDirLookup[dirLookup + 1] + p) * lod;
+    const uint3 v3_a = (CubeFaceDirLookup[dirLookup + 2] + p) * lod;
+
+    tri_a.vertices[0] = (v1_a.x & 1023) | (v1_a.y & 1023) << 10 | (v1_a.z & 1023) << 20;
+    tri_a.vertices[1] = (v2_a.x & 1023) | (v2_a.y & 1023) << 10 | (v2_a.z & 1023) << 20;
+    tri_a.vertices[2] = (v3_a.x & 1023) | (v3_a.y & 1023) << 10 | (v3_a.z & 1023) << 20;
     
-    tri_a.vertices[0].normal = normal;
-    tri_a.vertices[1].normal = normal;
-    tri_a.vertices[2].normal = normal;
-    
-    tri_a.vertices[0].color = col;
-    tri_a.vertices[1].color = col;
-    tri_a.vertices[2].color = col;
+    tri_a.normal = normal;
+    //tri_a.color = col;
 
     Triangle tri_b;
 
-    tri_b.vertices[0].position = CubeFaceDirLookup[dirLookup + 3] + p,
-    tri_b.vertices[1].position = CubeFaceDirLookup[dirLookup + 4] + p,
-    tri_b.vertices[2].position = CubeFaceDirLookup[dirLookup + 5] + p,
+    const uint3 v1_b = (CubeFaceDirLookup[dirLookup + 3] + p)  * lod;
+    const uint3 v2_b = (CubeFaceDirLookup[dirLookup + 4] + p)  * lod;
+    const uint3 v3_b = (CubeFaceDirLookup[dirLookup + 5] + p)  * lod;
 
-    tri_b.vertices[0].normal = normal;
-    tri_b.vertices[1].normal = normal;
-    tri_b.vertices[2].normal = normal;
+    tri_b.vertices[0] = (v1_b.x & 1023) | (v1_b.y & 1023) << 10 | (v1_b.z & 1023) << 20;
+    tri_b.vertices[1] = (v2_b.x & 1023) | (v2_b.y & 1023) << 10 | (v2_b.z & 1023) << 20;
+    tri_b.vertices[2] = (v3_b.x & 1023) | (v3_b.y & 1023) << 10 | (v3_b.z & 1023) << 20;
 
-    tri_b.vertices[0].color = col;
-    tri_b.vertices[1].color = col;
-    tri_b.vertices[2].color = col;
+    tri_b.normal = normal;
+    //tri_b.color = col;
 
     MeshBuffer.Append(tri_a);
     MeshBuffer.Append(tri_b);
@@ -147,31 +140,46 @@ void CreateCubeFace(uint dir, uint3 p, float3 col)
 [numthreads(8,8,8)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    const uint index = id.x + (id.y * CHUNK_SIZE) + (id.z * CHUNK_SIZE * CHUNK_SIZE);
+    const uint lod = 1 << ChunkLOD[0];
     
-    const int voxelIso = ChunkDataBuffer[index];
+    const uint x = id.x * lod;
+    const uint y = id.y * lod * ChunkSize[0] * ChunkSize[2];
+    const uint z = id.z * lod * ChunkSize[0];
+    
+    const uint index = x + y + z;
+    
+    const int voxelIso = ChunkDataBuffer[index] & 0x0F;
 
     if(voxelIso > 8)
     {
-        const float3 col = (float3(voxelIso, voxelIso, voxelIso) - 8.f) / 8.f;
+        const int visibilityFlag = ChunkDataBuffer[index] >> 4;
 
-        if(id.x > (CHUNK_SIZE-2) || ChunkDataBuffer[index + 1] <= 8)
-            CreateCubeFace(0, id, col);
+        const bool visXP = visibilityFlag & 1;
+        const bool visXN = (visibilityFlag >> 1) & 1;
+        const bool visYP = (visibilityFlag >> 2) & 1;
+        const bool visYN = (visibilityFlag >> 3) & 1;
+        const bool visZP = (visibilityFlag >> 4) & 1;
+        const bool visZN = (visibilityFlag >> 5) & 1;
         
-        if(id.x < 1 || ChunkDataBuffer[index - 1] <= 8)
-            CreateCubeFace(1, id, col);
+        const float3 col = 1.f;
+
+        if(visXP)
+            CreateCubeFace(0, id, col, lod);
+        
+        if(visXN)
+            CreateCubeFace(1, id, col, lod);
+
+        if(visYP)
+            CreateCubeFace(2, id, col, lod);
+        
+        if(visYN)
+            CreateCubeFace(3, id, col, lod);
        
-        if(id.y > (CHUNK_SIZE-2) || ChunkDataBuffer[index + CHUNK_SIZE] <= 8)
-            CreateCubeFace(2, id, col);
-       
-        if(id.y < 1 || ChunkDataBuffer[index - CHUNK_SIZE] <= 8)
-            CreateCubeFace(3, id, col);
+        if(visZP)
+            CreateCubeFace(4, id, col, lod);
         
-        if(id.z > (CHUNK_SIZE-2) || ChunkDataBuffer[index + CHUNK_SIZE * CHUNK_SIZE] <= 8)
-            CreateCubeFace(4, id, col);
-        
-        if(id.z < 1 || ChunkDataBuffer[index - CHUNK_SIZE * CHUNK_SIZE] <= 8)
-            CreateCubeFace(5, id, col);
+        if(visZN)
+            CreateCubeFace(5, id, col, lod);
     }
 }
 

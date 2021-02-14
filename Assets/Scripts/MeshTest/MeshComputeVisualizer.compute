@@ -4,7 +4,7 @@
 
 //////// Constants ////////
 
-static const uint CHUNK_SIZE = 32;
+static const uint CHUNK_SIZE = 64;
 
 //////// Struct Data Containers ////////
 
@@ -36,7 +36,7 @@ RWStructuredBuffer<DrawArg> DrawArgsBuffer;
 
 //////// Lookup Tables ////////
 
-static float3 NormalDirLookup[6] =
+static const float3 NormalDirLookup[6] =
 {
     float3( 1.0f,  0.0f,  0.0f),
     float3(-1.0f,  0.0f,  0.0f),
@@ -46,7 +46,7 @@ static float3 NormalDirLookup[6] =
     float3( 0.0f,  0.0f, -1.0f)
 };
 
-static float3 CubeFaceDirLookup[36] =
+static const float3 CubeFaceDirLookup[36] =
 {
     // X+
     float3(1.0f, 0.0f, 0.0f),
@@ -154,7 +154,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     
     const int voxelIso = ChunkDataBuffer[index];
 
-    if(voxelIso > 1)
+    if(voxelIso > 2 && voxelIso <= 14)
     {
         CreateCubeFace(0, id, voxelIso);
         CreateCubeFace(1, id, voxelIso);
@@ -162,6 +162,26 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         CreateCubeFace(3, id, voxelIso);
         CreateCubeFace(4, id, voxelIso);
         CreateCubeFace(5, id, voxelIso);
+    }
+    else if(voxelIso > 14)
+    {
+        if(id.x > (CHUNK_SIZE-2) || ChunkDataBuffer[index + 1] <= 14)
+            CreateCubeFace(0, id, voxelIso);
+        
+        if(id.x < 1 || ChunkDataBuffer[index - 1] <= 14)
+            CreateCubeFace(1, id, voxelIso);
+       
+        if(id.y > (CHUNK_SIZE-2) || ChunkDataBuffer[index + CHUNK_SIZE] <= 14)
+            CreateCubeFace(2, id, voxelIso);
+       
+        if(id.y < 1 || ChunkDataBuffer[index - CHUNK_SIZE] <= 14)
+            CreateCubeFace(3, id, voxelIso);
+        
+        if(id.z > (CHUNK_SIZE-2) || ChunkDataBuffer[index + CHUNK_SIZE * CHUNK_SIZE] <= 14)
+            CreateCubeFace(4, id, voxelIso);
+        
+        if(id.z < 1 || ChunkDataBuffer[index - CHUNK_SIZE * CHUNK_SIZE] <= 14)
+            CreateCubeFace(5, id, voxelIso);
     }
 }
 
