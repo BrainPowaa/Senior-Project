@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class PickUpController : MonoBehaviour
 {
-    public ProjectileGun gunScript;
     public Rigidbody rb;
     public BoxCollider coll;
-    public Transform player, gunContainer, fpsCam;
+    public Transform player, gunContainer, cam;
 
     public float pickUpRange;
     public float dropForwardForce, dropUpwardForce;
@@ -15,11 +14,19 @@ public class PickUpController : MonoBehaviour
     public bool equipped;
     public static bool slotFull;
 
+    Transform originalTrans;
+
     private void Update()
     {
         Vector3 distanceToPlayer = player.position - transform.position;
         if (!equipped && distanceToPlayer.magnitude <= pickUpRange && Input.GetKeyDown(KeyCode.E) && !slotFull)
             PickUp();
+
+        if (equipped)
+        {
+            transform.parent = player;
+
+        }
 
         if (equipped && Input.GetKeyDown(KeyCode.Q))
             Drop();
@@ -27,34 +34,46 @@ public class PickUpController : MonoBehaviour
 
     private void PickUp()
     {
+        transform.position = gunContainer.position;
+        transform.rotation = gunContainer.rotation;
         equipped = true;
         slotFull = true;
-
         rb.isKinematic = true;
         coll.isTrigger = true;
 
-        gunScript.enabled = true;
     }
     private void Drop()
     {
         equipped = false;
         slotFull = false;
+        transform.SetParent(null);
 
         rb.isKinematic = false;
         coll.isTrigger = false;
 
-        gunScript.enabled = false;
+        rb.velocity = player.GetComponent<Rigidbody>().velocity;
+
+        rb.AddForce(cam.forward * dropForwardForce, ForceMode.Impulse);
+        rb.AddForce(cam.up * dropUpwardForce, ForceMode.Impulse);
+
+        float random = Random.Range(-1f, 1f);
+        rb.AddTorque(new Vector3(random, random, random));
     }
 
 
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
+        if (!equipped)
+        {
+            rb.isKinematic = false;
+            coll.isTrigger = false;
+        }
+        if(equipped)
+        {
+            rb.isKinematic = true;
+            coll.isTrigger = true;
+            slotFull = true;
+        }
         
     }
 }
