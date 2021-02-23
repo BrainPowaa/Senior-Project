@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PickUpController : MonoBehaviour
 {
+    public MonoBehaviour gunScript;
     public Rigidbody rb;
     public BoxCollider coll;
     public Transform player, gunContainer, cam;
@@ -13,8 +14,6 @@ public class PickUpController : MonoBehaviour
 
     public bool equipped;
     public static bool slotFull;
-
-    Transform originalTrans;
 
     private void Update()
     {
@@ -40,6 +39,7 @@ public class PickUpController : MonoBehaviour
         slotFull = true;
         rb.isKinematic = true;
         coll.isTrigger = true;
+        gunScript.enabled = true;
 
     }
     private void Drop()
@@ -50,6 +50,7 @@ public class PickUpController : MonoBehaviour
 
         rb.isKinematic = false;
         coll.isTrigger = false;
+        gunScript.enabled = false;
 
         rb.velocity = player.GetComponent<Rigidbody>().velocity;
 
@@ -58,21 +59,25 @@ public class PickUpController : MonoBehaviour
 
         float random = Random.Range(-1f, 1f);
         rb.AddTorque(new Vector3(random, random, random));
+        
     }
 
 
     void Start()
     {
+        gunScript.enabled = false;
         if (!equipped)
         {
             rb.isKinematic = false;
             coll.isTrigger = false;
+            gunScript.enabled = false;
         }
         if(equipped)
         {
             rb.isKinematic = true;
             coll.isTrigger = true;
             slotFull = true;
+            gunScript.enabled = true;
         }
         
     }

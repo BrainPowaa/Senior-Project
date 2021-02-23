@@ -51,7 +51,6 @@ public class Player : MonoBehaviour
 
         if(Physics.Raycast(ray, out hit, .2f))
         {
-            Debug.Log("Hit!");
             return hit.collider != null;
         }
 
