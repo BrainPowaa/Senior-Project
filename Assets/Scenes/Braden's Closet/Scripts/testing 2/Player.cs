@@ -38,7 +38,7 @@ public class Player : MonoBehaviour
 
     void Jump ()
     {
-        if (true)
+        if (CanJump())
         {
             rig.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
@@ -49,8 +49,9 @@ public class Player : MonoBehaviour
         Ray ray = new Ray(transform.position, Vector3.down);
         RaycastHit hit;
 
-        if(Physics.Raycast(ray, out hit, 0.1f))
+        if(Physics.Raycast(ray, out hit, .2f))
         {
+            Debug.Log("Hit!");
             return hit.collider != null;
         }
 
