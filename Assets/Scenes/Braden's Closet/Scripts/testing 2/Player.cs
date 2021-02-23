@@ -4,7 +4,11 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public float moveSpeed;
+    public float jumpForce;
+
+    public Rigidbody rig;
+
     void Start()
     {
         
@@ -13,6 +17,43 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        Move();
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Jump();
+        }
+    }
+
+    void Move()
+    {
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
+
+        Vector3 dir = transform.right * x + transform.forward * z;
+        dir *= moveSpeed;
+        dir.y = rig.velocity.y;
+        rig.velocity = dir;
+    }
+
+    void Jump ()
+    {
+        if (true)
+        {
+            rig.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        }
+    }
+
+    bool CanJump ()
+    {
+        Ray ray = new Ray(transform.position, Vector3.down);
+        RaycastHit hit;
+
+        if(Physics.Raycast(ray, out hit, 0.1f))
+        {
+            return hit.collider != null;
+        }
+
+        return false;
     }
 }

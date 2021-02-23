@@ -145,6 +145,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b79fc566902c3343aa4e0f1cdb311e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveSpeed: 5
+  jumpForce: 5
+  rig: {fileID: 87053790}
 --- !u!143 &87053785
 CharacterController:
   m_ObjectHideFlags: 0
