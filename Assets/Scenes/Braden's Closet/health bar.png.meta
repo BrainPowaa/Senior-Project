@@ -1,7 +1,13 @@
 fileFormatVersion: 2
 guid: f4509457d27f9e54a8d25ea286379df7
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: 5871183766331710411
+    second: bar_empty
+  - first:
+      213: -8201765689491667245
+    second: bar_filled
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -89,11 +95,53 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: bar_empty
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 399
+        width: 512
+        height: 57
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bcbdd335782aa7150800000000000000
+      internalID: 5871183766331710411
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: bar_filled
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 455
+        width: 512
+        height: 57
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3d6ccda6f897d2e80800000000000000
+      internalID: -8201765689491667245
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 657f6c435fb36d24d97b5e810f507569
     internalID: 0
     vertices: []
     indices: 
