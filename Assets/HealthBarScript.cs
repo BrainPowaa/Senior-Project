@@ -18,7 +18,10 @@ public class HealthBarScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Fill -= Time.deltaTime * .1f;
-        Healthbar.fillAmount = Fill;
+        if (Fill > 0)
+        {
+            Fill -= Time.deltaTime * .1f;
+            Healthbar.fillAmount = Fill;
+        }
     }
 }
