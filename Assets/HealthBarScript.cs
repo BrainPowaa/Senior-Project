@@ -19,9 +19,5 @@ public class HealthBarScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Fill > 0)
-        {
-            Healthbar.fillAmount = Fill;
-        }
     }
 }

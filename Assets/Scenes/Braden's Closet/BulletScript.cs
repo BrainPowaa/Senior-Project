@@ -19,7 +19,7 @@ public class BulletScript : MonoBehaviour {
         if (collision.transform.tag == "Mob")
         {
             var target = collision.gameObject;
-            target.GetComponent<HealthBarScript>().Fill -= .25f;
+            target.GetComponent<HealthBarScript>().Healthbar.fillAmount -= .25f;
 
             gameObject.SetActive(false);
         }
