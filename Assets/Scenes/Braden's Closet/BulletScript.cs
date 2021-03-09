@@ -16,7 +16,7 @@ public class BulletScript : MonoBehaviour {
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.transform.tag == "enemy")
+        if (collision.transform.tag == "Mob")
         {
             Destroy(collision.gameObject);
 
