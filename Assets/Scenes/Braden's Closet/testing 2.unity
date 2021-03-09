@@ -4951,7 +4951,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  jumpForce: 5
+  jumpForce: 10
   rig: {fileID: 87053790}
 --- !u!143 &87053785
 CharacterController:
@@ -7943,7 +7943,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 3dea7ae3e0f93f1449a83280e4428f06, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.088
+  m_Volume: 0.058
   m_Pitch: 1
   Loop: 0
   Mute: 0

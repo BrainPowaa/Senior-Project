@@ -24,6 +24,16 @@ public class BulletScript : MonoBehaviour {
             gameObject.SetActive(false);
         }
     }
+    private void OnTriggerEnter(Collider collision)
+    {
+        if (collision.transform.tag == "Mob")
+        {
+            var target = collision.gameObject;
+            target.GetComponent<HealthBarScript>().Healthbar.fillAmount -= .25f;
+
+            gameObject.SetActive(false);
+        }
+    }
 
 
 }
