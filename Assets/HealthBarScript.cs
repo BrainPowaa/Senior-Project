@@ -11,6 +11,7 @@ public class HealthBarScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
         Fill = 1f;
         
     }
@@ -20,7 +21,6 @@ public class HealthBarScript : MonoBehaviour
     {
         if (Fill > 0)
         {
-            Fill -= Time.deltaTime * .1f;
             Healthbar.fillAmount = Fill;
         }
     }

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class BulletScript : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 		
 	}
 	
@@ -18,7 +18,8 @@ public class BulletScript : MonoBehaviour {
     {
         if (collision.transform.tag == "Mob")
         {
-            Destroy(collision.gameObject);
+            var target = collision.gameObject;
+            target.GetComponent<HealthBarScript>().Fill -= .25f;
 
             gameObject.SetActive(false);
         }

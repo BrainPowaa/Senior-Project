@@ -21,7 +21,7 @@ public class Shooting : MonoBehaviour
     void Fire()
     {
         //Shoot
-        GameObject tempBullet = Instantiate(bullet, transform.position, transform.rotation) as GameObject;
+        GameObject tempBullet = Instantiate(bullet, transform.GetChild(2).position, transform.GetChild(2).rotation) as GameObject;
         Rigidbody tempRigidBodyBullet = tempBullet.GetComponent<Rigidbody>();
         tempRigidBodyBullet.AddForce(tempRigidBodyBullet.transform.forward * bulletSpeed);
         Destroy(tempBullet, 0.5f);
