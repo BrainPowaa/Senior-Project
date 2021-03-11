@@ -13,6 +13,7 @@ public class zombieScript : MonoBehaviour
     private GameObject wayPoint;
     private Vector3 wayPointPos;
     private bool found = false;
+    private bool alive = true;
 
 
 
@@ -40,6 +41,20 @@ public class zombieScript : MonoBehaviour
             //Here, the zombie's will follow the waypoint.
 
             transform.position = Vector3.MoveTowards(transform.position, wayPointPos, mobSpeed * Time.deltaTime);
+        }
+
+        if (gameObject.GetComponent<HealthBarScript>().Healthbar.fillAmount <= 0 && alive == true)
+        {
+            mobRig.AddForce(Vector3.forward * 10, ForceMode.Impulse);
+            alive = false;
+            StartCoroutine(die());
+            
+        }
+
+        IEnumerator die()
+        {
+            yield return new WaitForSeconds(2);
+            Destroy(gameObject);
         }
     }
 }
