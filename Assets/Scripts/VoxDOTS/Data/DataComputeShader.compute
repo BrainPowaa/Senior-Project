@@ -21,9 +21,6 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         
     fnl_state surfaceNoise1 = fnlCreateState(seed);
     fnl_state surfaceNoise2 = fnlCreateState(seed/(uint)2);
-    
-    // FastNoiseCave caveNoise1 = new FastNoiseCave();
-    // FastNoiseCave caveNoise2 = new FastNoiseCave();
 
     float x = id.x * scale;
     float y = id.y * scale;
@@ -37,28 +34,28 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
             
     // Cave Generation
-    // caveNoise1.SetSeed(seed);
-    // caveNoise2.SetSeed(seed/2);
-    //         
-    // caveNoise1.SetCellularJitter(0.3f);
-    // caveNoise2.SetCellularJitter(0.3f);
-    //         
-    // caveNoise1.SetFrequency(caveFrequency);
-    // caveNoise2.SetFrequency(caveFrequency);
-    //
-    // caveNoise1.SetCellularReturnType(FastNoiseCave.CellularReturnType.Distance2Div);
-    // caveNoise2.SetCellularReturnType(FastNoiseCave.CellularReturnType.Distance2Div);
-    //
-    //
-    // float caveNoiseValue1 = caveNoise1.GetCellular(x, y, z);
-    // x += caveFrequency * 0.5f;
-    // y += caveFrequency * 0.5f;
-    // z += caveFrequency * 0.5f;
-    // float caveNoiseValue2 = caveNoise2.GetCellular(x, y, z);
-    //
-    // float caveNoiseValue = min(caveNoiseValue1, caveNoiseValue2);
-    // caveNoiseValue = min(max(caveNoiseValue, -1.0f), 1.0f);
-    // float caves = (caveNoiseValue * caveNoiseScale);
+    fnl_state caveNoise1  = fnlCreateState(seed);
+    caveNoise2.SetSeed(seed/2);
+            
+    caveNoise1.SetCellularJitter(0.3f);
+    caveNoise2.SetCellularJitter(0.3f);
+            
+    caveNoise1.SetFrequency(caveFrequency);
+    caveNoise2.SetFrequency(caveFrequency);
+    
+    caveNoise1.SetCellularReturnType(FastNoiseCave.CellularReturnType.Distance2Div);
+    caveNoise2.SetCellularReturnType(FastNoiseCave.CellularReturnType.Distance2Div);
+    
+    
+    float caveNoiseValue1 = caveNoise1.GetCellular(x, y, z);
+    x += caveFrequency * 0.5f;
+    y += caveFrequency * 0.5f;
+    z += caveFrequency * 0.5f;
+    float caveNoiseValue2 = caveNoise2.GetCellular(x, y, z);
+    
+    float caveNoiseValue = min(caveNoiseValue1, caveNoiseValue2);
+    caveNoiseValue = min(max(caveNoiseValue, -1.0f), 1.0f);
+    float caves = (caveNoiseValue * caveNoiseScale);
     
     const uint index = id.x + (id.y * CHUNK_SIZE) + (id.z * CHUNK_SIZE * CHUNK_SIZE);
     ChunkDataBuffer[index] = hills * 1;
