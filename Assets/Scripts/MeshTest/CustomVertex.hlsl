@@ -1,11 +1,3 @@
-uint _TriangleCount;
-float _LocalTime;
-float _Extent;
-float _NoiseAmplitude;
-float _NoiseFrequency;
-float3 _NoiseOffset;
-float4x4 _LocalToWorld;
-
 struct Triangle
 {
     float3 normal;

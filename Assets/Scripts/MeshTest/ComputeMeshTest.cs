@@ -50,7 +50,7 @@ public class ComputeMeshTest : MonoBehaviour
     void OnEnable()
     {
         // TEMP: Voxel count, use actual constants later.
-        long maxVoxelCount = Constants.MaxChunkSize * chunkCount.x * chunkCount.y * chunkCount.z;
+        long maxVoxelCount = chunkSize * chunkSize * chunkSize * chunkCount.x * chunkCount.y * chunkCount.z;
 
         _chunkSizeBuffer = new ComputeBuffer(3, sizeof(uint));
         _chunkSizeBuffer.SetData(new[]
