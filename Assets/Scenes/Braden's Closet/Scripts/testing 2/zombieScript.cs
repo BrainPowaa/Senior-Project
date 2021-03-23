@@ -13,6 +13,7 @@ public class zombieScript : MonoBehaviour
     private Vector3 wayPointPos;
     private bool found = false;
     private bool alive = true;
+    public AudioSource sound;
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -41,6 +42,7 @@ public class zombieScript : MonoBehaviour
         {
             if (found == false)
             {
+                sound.Play();
                 mobRig.AddForce(Vector3.up * 3, ForceMode.Impulse);
                 found = true;
             }

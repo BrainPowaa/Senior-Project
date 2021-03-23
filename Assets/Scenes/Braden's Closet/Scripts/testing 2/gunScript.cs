@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class gunScript : MonoBehaviour
 {
+    public AudioSource sound;
     public ParticleSystem laser;
     // Start is called before the first frame update
     void Start()
@@ -17,6 +18,7 @@ public class gunScript : MonoBehaviour
         {
             var emi = laser.emission;
             emi.enabled = true;
+            sound.Play();
         }
         else
         {

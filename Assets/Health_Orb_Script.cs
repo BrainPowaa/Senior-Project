@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Health_Orb_Script : MonoBehaviour
 {
+    public AudioSource sound;
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.transform.tag == "Player")
@@ -32,6 +33,7 @@ public class Health_Orb_Script : MonoBehaviour
     {
         target.GetComponent<Renderer>().material.color = Color.green;
         target.GetComponent<HealthBarScript>().Healthbar.fillAmount += .25f;
+        sound.Play();
         foreach (Transform child in transform)
         {
             GameObject.Destroy(child.gameObject);
