@@ -19,7 +19,7 @@ public class zombieScript : MonoBehaviour
         if (collision.transform.tag == "Player")
         {
             var target = collision.gameObject;
-            mobRig.AddForce(Vector3.forward * 10, ForceMode.Impulse);
+            mobRig.AddForce(Vector3.forward * 15, ForceMode.Impulse);
             StartCoroutine(damage(target));
             
             
@@ -67,7 +67,7 @@ public class zombieScript : MonoBehaviour
     {
         target.GetComponent<Renderer>().material.color = Color.red;
         target.GetComponent<HealthBarScript>().Healthbar.fillAmount -= .25f;
-        target.GetComponent<Rigidbody>().AddForce(Vector3.back * 10, ForceMode.Impulse);
+        target.GetComponent<Rigidbody>().AddForce(Vector3.back * 20, ForceMode.Impulse);
         yield return new WaitForSeconds(1);
         target.GetComponent<Renderer>().material.color = Color.white;
     }
