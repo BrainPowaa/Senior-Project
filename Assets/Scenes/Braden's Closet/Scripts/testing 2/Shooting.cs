@@ -20,19 +20,16 @@ public class Shooting : MonoBehaviour
 
     void Fire()
     {
-        //Shoot
         GameObject tempBullet = Instantiate(bullet, transform.GetChild(2).position, transform.GetChild(2).rotation) as GameObject;
         Rigidbody tempRigidBodyBullet = tempBullet.GetComponent<Rigidbody>();
         tempRigidBodyBullet.AddForce(tempRigidBodyBullet.transform.forward * bulletSpeed);
         Destroy(tempBullet, 0.5f);
 
-        //Play Audio
         bulletAudio.Play();
 
     }
 
 
-    // Update is called once per frame
     void Update()
     {
 

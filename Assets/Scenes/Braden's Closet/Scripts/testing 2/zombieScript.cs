@@ -6,7 +6,6 @@ using UnityEngine.AI;
 public class zombieScript : MonoBehaviour
 {
 
-    public GameObject Player;
     public float mobRange;
     public float mobSpeed = 3.0f;
     public Rigidbody mobRig;
@@ -15,7 +14,16 @@ public class zombieScript : MonoBehaviour
     private bool found = false;
     private bool alive = true;
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.tag == "Player")
+        {
+            var target = collision.gameObject;
+            target.GetComponent<HealthBarScript>().Healthbar.fillAmount -= .25f;
 
+            gameObject.SetActive(false);
+        }
+    }
 
     void Start()
     {
@@ -37,9 +45,6 @@ public class zombieScript : MonoBehaviour
             }
             transform.LookAt(wayPoint.transform);
             wayPointPos = new Vector3(wayPoint.transform.position.x, transform.position.y, wayPoint.transform.position.z);
-
-            //Here, the zombie's will follow the waypoint.
-
             transform.position = Vector3.MoveTowards(transform.position, wayPointPos, mobSpeed * Time.deltaTime);
         }
 
@@ -50,11 +55,10 @@ public class zombieScript : MonoBehaviour
             StartCoroutine(die());
             
         }
-
-        IEnumerator die()
-        {
-            yield return new WaitForSeconds(2);
-            Destroy(gameObject);
-        }
+    }
+    IEnumerator die()
+    {
+        yield return new WaitForSeconds(2);
+        Destroy(gameObject);
     }
 }
