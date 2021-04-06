@@ -16,7 +16,7 @@ public class SwordAttackScript : MonoBehaviour
     public List<SlashParameters> slashes;
     public Transform sword;
 
-    private Animator anim;
+    private bool toggleActive = false;
     private SlashParameters effectToSpawn;
     private int currentAttack;
 
@@ -24,36 +24,20 @@ public class SwordAttackScript : MonoBehaviour
     {
         VFXSelecter(1);
 
-        anim = GetComponent<Animator>();
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetKeyUp(KeyCode.G))
         {
-            VFXSelecter(1);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            VFXSelecter(2);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            VFXSelecter(3);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            VFXSelecter(4);
+            toggleActive = !toggleActive;
+            transform.GetChild(1).gameObject.SetActive(toggleActive);
         }
 
         if (Input.GetMouseButtonDown(0))
         {
-            anim.SetTrigger("Attack0" + currentAttack.ToString());
             StartCoroutine(Slash());
         }
     }
@@ -61,7 +45,12 @@ public class SwordAttackScript : MonoBehaviour
     IEnumerator Slash()
     {
         yield return new WaitForSeconds(effectToSpawn.delay);
-        GameObject vfx = Instantiate(effectToSpawn.slash, sword.position, sword.rotation) as GameObject;
+        Quaternion targetRot = Quaternion.Euler(140, 180, 0);
+        Vector3 targetScale = new Vector3(4, 4, 4);
+        Vector3 targetPos = new Vector3(-3, 2, 3);
+        GameObject vfx = Instantiate(effectToSpawn.slash, sword.position + targetPos, targetRot) as GameObject;
+        vfx.transform.GetChild(0).transform.localScale += targetScale;
+        vfx.transform.GetChild(0).GetChild(0).transform.localScale += targetScale;
         Destroy(vfx, 2);
 
         if (updateRotation || updatePosition) {

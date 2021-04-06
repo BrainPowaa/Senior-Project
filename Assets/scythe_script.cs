@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class scythe_script : MonoBehaviour
 {
+    public MonoBehaviour slashScript;
     private bool toggleActive = false;
     // Start is called before the first frame update
     void Start()
