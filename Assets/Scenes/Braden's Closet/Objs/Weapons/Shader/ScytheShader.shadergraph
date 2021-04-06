@@ -593,7 +593,7 @@
     "m_Hidden": false,
     "m_ShaderOutputName": "Smoothness",
     "m_StageCapability": 2,
-    "m_Value": 0.5,
+    "m_Value": 0.5400000214576721,
     "m_DefaultValue": 0.5,
     "m_Labels": []
 }
@@ -1588,10 +1588,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -768.0000610351563,
-            "y": 125.00000762939453,
-            "width": 208.00001525878907,
-            "height": 437.0
+            "x": -800.0001220703125,
+            "y": 155.00003051757813,
+            "width": 208.0,
+            "height": 437.0000305175781
         }
     },
     "m_Slots": [
