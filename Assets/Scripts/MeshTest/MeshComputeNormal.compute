@@ -17,6 +17,7 @@ struct DrawArg
 struct Triangle
 {
     float3 normal;
+    float3 color;
     // Packed verts
     int vertices[3];
 };
@@ -117,7 +118,7 @@ void CreateCubeFace(uint dir, uint3 p, float3 col, uint lod)
     tri_a.vertices[2] = (v3_a.x & 1023) | (v3_a.y & 1023) << 10 | (v3_a.z & 1023) << 20;
     
     tri_a.normal = normal;
-    //tri_a.color = col;
+    tri_a.color = col;
 
     Triangle tri_b;
 
@@ -130,7 +131,7 @@ void CreateCubeFace(uint dir, uint3 p, float3 col, uint lod)
     tri_b.vertices[2] = (v3_b.x & 1023) | (v3_b.y & 1023) << 10 | (v3_b.z & 1023) << 20;
 
     tri_b.normal = normal;
-    //tri_b.color = col;
+    tri_b.color = col;
 
     MeshBuffer.Append(tri_a);
     MeshBuffer.Append(tri_b);
@@ -148,11 +149,11 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     
     const uint index = x + y + z;
     
-    const int voxelIso = ChunkDataBuffer[index] & 0x0F;
+    const int voxelIso = ChunkDataBuffer[index] & 0xF;
 
     if(voxelIso > 8)
     {
-        const int visibilityFlag = ChunkDataBuffer[index] >> 4;
+        const uint visibilityFlag = (ChunkDataBuffer[index] >> 4) & 63;
 
         const bool visXP = visibilityFlag & 1;
         const bool visXN = (visibilityFlag >> 1) & 1;
@@ -160,8 +161,19 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         const bool visYN = (visibilityFlag >> 3) & 1;
         const bool visZP = (visibilityFlag >> 4) & 1;
         const bool visZN = (visibilityFlag >> 5) & 1;
+
+        const int packedColor = (ChunkDataBuffer[index] >> 0) & 0xFFF;
+
+        // Unpack the colors by masking            BBBB GGGG RRRR
+        const uint colorR =  packedColor & 0x00F; // 00000000[RRRR]
+        const uint colorG = (packedColor & 0x0F0) >> 4; // 0000[GGGG]0000
+        const uint colorB = (packedColor & 0xF00) >> 8; // [BBBB]00000000
         
-        const float3 col = 1.f;
+        const float3 col = float3(
+            colorR / 15.f,
+            colorG / 15.f,
+            colorB / 15.f
+        );
 
         if(visXP)
             CreateCubeFace(0, id, col, lod);

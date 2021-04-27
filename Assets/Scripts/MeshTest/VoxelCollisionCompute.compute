@@ -1,0 +1,47 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+struct Sphere
+{
+    uint x;
+    uint y;
+    uint z;
+
+    float r;
+};
+
+// Voxel stuff
+RWStructuredBuffer<int> ChunkDataBuffer;
+RWStructuredBuffer<uint> ChunkSize;
+RWStructuredBuffer<uint> ChunkLOD;
+
+// Our single sphere, we could branch out and do more but this suffices for now
+RWStructuredBuffer<Sphere> SphereData;
+
+// Return data
+RWStructuredBuffer<uint> ReturnData;
+
+[numthreads(8,8,8)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // Sphere intersection test
+    const uint lod = 1 << ChunkLOD[0];
+    
+    const uint x = id.x * lod;
+    const uint y = id.y * lod * ChunkSize[0] * ChunkSize[2];
+    const uint z = id.z * lod * ChunkSize[0];
+    
+    const uint index = x + y + z;
+    
+    const int voxelIso = ChunkDataBuffer[index];
+
+    // Is the voxel solid?
+    if(voxelIso > 8)
+    {
+        Sphere s = SphereData[0];
+
+        // Is the voxel within our sphere?
+        if(distance(float3(x, y, z), float3(s.x, s.y, s.z)) <= s.r)
+            ReturnData[0] = 1;
+    }
+}

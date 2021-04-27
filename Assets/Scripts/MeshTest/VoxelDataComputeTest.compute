@@ -45,6 +45,48 @@ RWStructuredBuffer<int> ChunkDataBuffer;
 RWStructuredBuffer<int> Offset;
 RWStructuredBuffer<uint> ChunkSize;
 RWStructuredBuffer<uint> ChunkLOD;
+/*
+//////// Instancing /////////
+
+struct VoxModel {
+    int ChunkData[];
+}
+
+struct Transform {
+    int Direction;
+    int X;
+    int Y;
+    int Z;
+}
+
+struct VoxInstanceData {
+    int numTransforms;
+    Transform transforms[];
+}
+
+RWStructuredBuffer<VoxModel> Models;
+RWStructuredBuffer<int> ModelCount;
+RWStructuredBuffer<VoxInstanceData> InstanceData;
+
+// Called once per modification
+[numthreads(1)]
+void InsertInstanceData()
+{
+    for(int i = 0; i < ModelCount; i++)
+    {
+        VoxModel model = Models[i]
+        VoxInstanceData instance = InstanceData[i]
+
+        for(int j = 0; j < instance.numTransforms; j++)
+        {
+            Transform t = instance.transforms[j]
+            int transformedChunkData = OffsetChunk(model.ChunkData, t.X, t.Y, t.Z)
+
+            ChunkDataBuffer.Append(transformedChunkData)
+        }
+    }
+}
+*/
 
 // Main
 [numthreads(8,8,8)]
@@ -70,7 +112,18 @@ void UpdateVoxelData(uint3 id : SV_DispatchThreadID)
     noise = max(noise, 10.f - y);
     
     const uint index = x + y * ChunkSize[0] * ChunkSize[2] + z * ChunkSize[0];
+    
     ChunkDataBuffer[index] = clamp(noise, 0, 15);
+
+    // 4 + 4 + 4 bit color ID // COLOR PACK
+
+    const uint color_r = (0) & 0xF;
+    const uint color_g = (0) & 0xF;
+    const uint color_b = (0) & 0xF;
+
+    const uint packed_colors = (color_r << 0) | (color_g << 4) | (color_b << 8);
+
+    ChunkDataBuffer[index] |= (packed_colors << 16);
 }
 
 //TEMP

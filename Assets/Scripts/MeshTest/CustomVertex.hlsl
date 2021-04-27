@@ -1,6 +1,7 @@
 struct Triangle
 {
     float3 normal;
+    float3 color;
     // Packed verts
     int vertices[3];
 };
@@ -42,8 +43,8 @@ PackedVaryingsType CustomVert(Attributes input)
     am.uv3 = 0;
 #endif
 #ifdef ATTRIBUTES_NEED_COLOR
-    am.color.xyz = 1.f;
-    //am.color.xyz = tri.color;
+    //am.color.xyz = 1.f;
+    am.color.xyz = tri.color;
 #endif
     UNITY_TRANSFER_INSTANCE_ID(input, am);
 

@@ -61,7 +61,7 @@ public class ComputeMeshTest : MonoBehaviour
         });
 
         // Voxel data buffer on the GPU.
-        _chunkDataBuffer = new ComputeBuffer((int)maxVoxelCount, sizeof(int));
+        _chunkDataBuffer = new ComputeBuffer((int)maxVoxelCount, sizeof(uint) * 2);
 
         _triangleCountBuffer = new ComputeBuffer(1, sizeof(int));
         _triangleCountBuffer.SetData(triangleCount);
@@ -122,7 +122,7 @@ public class ComputeMeshTest : MonoBehaviour
 
         // Mesh buffer on the GPU.
         // Potentially 12 triangles per voxel (each triangle has 3 verts/norms (each is 3+3+3 floats) for a total of 3*(3*3) floats)
-        _meshBuffer = new ComputeBuffer(triangleCount[0], sizeof(float) * (3 + 3), ComputeBufferType.Append);
+        _meshBuffer = new ComputeBuffer(triangleCount[0], sizeof(float) * (3 + 3 + 3), ComputeBufferType.Append);
 
         // Reset mesh counter for new writes.
         _meshBuffer.SetCounterValue(0);

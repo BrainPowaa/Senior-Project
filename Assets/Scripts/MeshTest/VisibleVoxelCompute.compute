@@ -26,12 +26,12 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     if(voxelIso > 8)
     {
         // Determines how many faces are visible
-        const int visiblePosX = id.x > (ChunkSize[0]-2) || ChunkDataBuffer[index + lod] <= 8;
-        const int visibleNegX = id.x < 1                || ChunkDataBuffer[index - lod] <= 8;
-        const int visiblePosY = id.y > (ChunkSize[1]-2) || ChunkDataBuffer[index + ChunkSize[0] * ChunkSize[2] * lod] <= 8;
-        const int visibleNegY = id.y < 1                || ChunkDataBuffer[index - ChunkSize[0] * ChunkSize[2] * lod] <= 8;
-        const int visiblePosZ = id.z > (ChunkSize[2]-2) || ChunkDataBuffer[index + ChunkSize[0] * lod] <= 8;
-        const int visibleNegZ = id.z < 1                || ChunkDataBuffer[index - ChunkSize[0] * lod] <= 8;
+        const uint visiblePosX = id.x > (ChunkSize[0]-2) || ChunkDataBuffer[index + lod] <= 8;
+        const uint visibleNegX = id.x < 1                || ChunkDataBuffer[index - lod] <= 8;
+        const uint visiblePosY = id.y > (ChunkSize[1]-2) || ChunkDataBuffer[index + ChunkSize[0] * ChunkSize[2] * lod] <= 8;
+        const uint visibleNegY = id.y < 1                || ChunkDataBuffer[index - ChunkSize[0] * ChunkSize[2] * lod] <= 8;
+        const uint visiblePosZ = id.z > (ChunkSize[2]-2) || ChunkDataBuffer[index + ChunkSize[0] * lod] <= 8;
+        const uint visibleNegZ = id.z < 1                || ChunkDataBuffer[index - ChunkSize[0] * lod] <= 8;
 
         // const int visiblePosX = 1;
         // const int visibleNegX = 1;
@@ -40,12 +40,12 @@ void CSMain (uint3 id : SV_DispatchThreadID)
         // const int visiblePosZ = 1;
         // const int visibleNegZ = 1;
 
-        const int visible = visiblePosX + visibleNegX + visiblePosY + visibleNegY + visiblePosZ + visibleNegZ;
+        const uint visible = visiblePosX + visibleNegX + visiblePosY + visibleNegY + visiblePosZ + visibleNegZ;
 
         // Add faces * 2 to triangle count (2 triangles per face)
         InterlockedAdd(TriangleCount[0], 12);
 
-        const int visibilityFlag =
+        const uint visibilityFlag =
             visiblePosX
             | visibleNegX << 1
             | visiblePosY << 2
