@@ -6,7 +6,6 @@ using UnityEngine.AI;
 public class zombieScript : MonoBehaviour
 {
 
-    public GameObject Player;
     public float mobRange;
     public float mobSpeed = 3.0f;
     public Rigidbody mobRig;
@@ -14,8 +13,19 @@ public class zombieScript : MonoBehaviour
     private Vector3 wayPointPos;
     private bool found = false;
     private bool alive = true;
+    public AudioSource sound;
 
-
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.tag == "Player")
+        {
+            var target = collision.gameObject;
+            mobRig.AddForce(Vector3.forward * 15, ForceMode.Impulse);
+            StartCoroutine(damage(target));
+            
+            
+        }
+    }
 
     void Start()
     {
@@ -32,14 +42,12 @@ public class zombieScript : MonoBehaviour
         {
             if (found == false)
             {
+                sound.Play();
                 mobRig.AddForce(Vector3.up * 3, ForceMode.Impulse);
                 found = true;
             }
             transform.LookAt(wayPoint.transform);
             wayPointPos = new Vector3(wayPoint.transform.position.x, transform.position.y, wayPoint.transform.position.z);
-
-            //Here, the zombie's will follow the waypoint.
-
             transform.position = Vector3.MoveTowards(transform.position, wayPointPos, mobSpeed * Time.deltaTime);
         }
 
@@ -50,11 +58,19 @@ public class zombieScript : MonoBehaviour
             StartCoroutine(die());
             
         }
+    }
+    IEnumerator die()
+    {
+        yield return new WaitForSeconds(2);
+        Destroy(gameObject);
+    }
 
-        IEnumerator die()
-        {
-            yield return new WaitForSeconds(2);
-            Destroy(gameObject);
-        }
+    IEnumerator damage(GameObject target)
+    {
+        target.GetComponent<Renderer>().material.color = Color.red;
+        target.GetComponent<HealthBarScript>().Healthbar.fillAmount -= .25f;
+        target.GetComponent<Rigidbody>().AddForce(Vector3.back * 20, ForceMode.Impulse);
+        yield return new WaitForSeconds(1);
+        target.GetComponent<Renderer>().material.color = Color.white;
     }
 }

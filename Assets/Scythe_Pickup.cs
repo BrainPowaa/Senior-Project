@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PickUpController : MonoBehaviour
+public class Scythe_Pickup : MonoBehaviour
 {
     public MonoBehaviour weaponScript;
     public Rigidbody rb;
@@ -59,7 +59,7 @@ public class PickUpController : MonoBehaviour
 
         float random = Random.Range(-1f, 1f);
         rb.AddTorque(new Vector3(random, random, random));
-        
+
     }
 
 
@@ -72,13 +72,14 @@ public class PickUpController : MonoBehaviour
             coll.isTrigger = false;
             weaponScript.enabled = false;
         }
-        if(equipped)
+        if (equipped)
         {
             rb.isKinematic = true;
             coll.isTrigger = true;
             slotFull = true;
             weaponScript.enabled = true;
         }
-        
+
     }
+
 }
